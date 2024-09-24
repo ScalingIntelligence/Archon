@@ -153,12 +153,14 @@ Otherwise, it will look for environment variables.
 
 ## Citation
 ```bibtex
-@article{placeholder,
-      title={Archon: An Architecture Search Framework for Inference-Time Techniques},
-      author={placeholder},
+@misc{saadfalcon2024archonarchitecturesearchframework,
+      title={Archon: An Architecture Search Framework for Inference-Time Techniques}, 
+      author={Jon Saad-Falcon and Adrian Gamarra Lafuente and Shlok Natarajan and Nahum Maru and Hristo Todorov and E. Kelly Buchanan and Mayee Chen and Neel Guha and Christopher Ré and Azalia Mirhoseini},
       year={2024},
-      eprint={placeholder},
-      archivePrefix={arXiv}
+      eprint={2409.15254},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2409.15254}, 
 }
 ```
 
