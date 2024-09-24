@@ -9,14 +9,14 @@ First, you will have to generate your answers for alapca_eval using `gen_answers
 python3 gen_answers.py --benchmark alpaca_eval --config configs/<your-config-file>.json --parallel 16
 ```
 
-This will save your output to an `outputs/alapca_eval/` folder in the archon subdirectory. 
+This will save your output to an `outputs/model_aswer/alapca_eval/` folder in the archon subdirectory. 
 
 ## Evaluate answers
 
-After you have your answers, you can run this command to evaluate, input your model output as the argument 
+After you have your answers, you can run this command to evaluate, input your model output as the argument. FOr example
 
 ```
-alpaca_eval --model_outputs outputs/alpaca_eval/archon-claude-3-5-sonnet-sample_10_then_critic_then_fuse.json
+alpaca_eval --model_outputs outputs/model_answer/alpaca_eval/archon-claude-3-5-sonnet-sample_10_then_critic_then_fuse.json
 ```
 
 ## Show answers

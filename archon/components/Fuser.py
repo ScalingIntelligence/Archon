@@ -85,10 +85,8 @@ class Fuser:
         )
 
         fuser_generations = []
-        
-        if utils.DEBUG:
-            logger.debug(f"Fusion sample {_}")
-        output = self.fuser.generate_from_messages(messages)
+
+        output = self.fuser.generate_from_messages(messages, self.temperature)
         if output is not None:
             fuser_generations.extend(output)
 

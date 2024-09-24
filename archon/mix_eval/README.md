@@ -4,22 +4,6 @@ The [MixEval](https://github.com/Psycoy/MixEval) and MixEval-Hard benchmark are 
 
 The [MixEval](https://github.com/Psycoy/MixEval) and [MixEval-Hard](https://github.com/Psycoy/MixEval) benchmark are updated periodically every few months. This code uses the version populated in the HF dataset [here](https://huggingface.co/datasets/MixEval/MixEval). 
 
-## An Overview of MixEval and MixEval-Hard
-
-**MixEval** is an approach that bridges the gap between real-world user queries and efficient, reproducible evaluation by leveraging user queries mined from the web and matching them with similar queries from existing benchmarks. MixEval is also the proposed benchmark built with this approach.
-
-**MixEval-Hard** is the hard version of MixEval, designed to enhance the benchmark's ability to distinguish strong models. It is sampled from MixEval based on model evaluation results, with a higher probability of selecting harder queries. To address distribution deviation, MixEval-Hard introduces a rejective sampling process to ensure that the distribution of MixEval-Hard aligns with that of wild queries.
-
-Dynamic evaluation is introduced to mitigate the contamination issue. The data points in MixEval and MixEval-Hard are periodically updated using a fast, stable pipeline, which performs benchmark mixture with a different batch of wild queries from the same distribution, showing low variance (0.36 Std. on a 0-100 scale) and significant version difference (85% unique query ratio).
-
-**MixEval offers five significant advantages for practitioners:**
-
-- Accurate model ranking, demonstrated by a 0.96 correlation with Chatbot Arena1.
-- Fast, cheap and reproducible execution, requiring only 6% the time and cost of MMLU and with no dependence on human input.
-- Dynamic benchmarking enabled by low-effort and stable updating mechanism.
-- A comprehensive and less biased query distribution, as it bases queries on a large-scale web corpus.
-- A fair grading process, ensured by the ground-truth-based grading mechanism.
-
 ## Generate answers
 
 You will have to generate your answers for MixEval or MixEval-Hard using `gen_answers.py` from the archon subdirectory (the parent folder of this folder). An Example of how to do that will be to run this script.

@@ -13,13 +13,10 @@ from benchmarks import BENCHMARK_CLASSES, load_benchmark
 import time
 
 
-def main(args):
-    logger.info(f"Start.")
-
+def initialize_debug(args):
     if args.debug:
         utils.DEBUG = 1
         logger.debug("In DEBUG mode")
-
     if args.debug_verifier:
         utils.DEBUG_VERIFIER = 1
         logger.debug("In DEBUG VERIFIER mode")
@@ -30,27 +27,30 @@ def main(args):
         utils.DEBUG_UNIT_TEST_GENERATOR = 1
         logger.debug("In DEBUG UNIT TEST GENERATOR mode")
 
-    # Initialize the Archon with the specified configuration settings.
-    if args.config:
-        logger.info("loading: " + args.config)
-    else:
-        logger.warning("No config file given. Using default config")
+
+def main(args):
+    logger.info(f"Start.")
+
+    # initialize debug modes
+    initialize_debug(args)
+
+    # Load Archon configuration
+    logger.info("loading: " + args.config)
     archon_config = load_config(args.config)
+
     if "name" not in archon_config:
-        archon_config["name"] = "archon-" + time.strftime("%m%d%Y-%H:%M:%S")
+        name = "archon-" + time.strftime("%m%d%Y-%H:%M:%S")
+        logger.warning(
+            "Make sure to add 'name' to your config. Will continue run with {name}"
+        )
+        archon_config["name"] = name
 
     if utils.DEBUG:
         logger.debug(f"{archon_config=}")
 
-    archon = Archon(config=archon_config, api_key_file=args.api_keys)
-
+    # initialize Archon
+    archon = Archon(config=archon_config, api_key_data=args.api_keys)
     logger.info("Finished initializing archon")
-
-    if not hasattr(args, "dataset_sample"):
-        args.dataset_sample = 1.0
-
-    if not hasattr(args, "samples"):
-        args.samples = 1
 
     benchmark = load_benchmark(
         benchmark_name=args.benchmark,
@@ -59,10 +59,8 @@ def main(args):
     )
     eval_set = benchmark.load_dataset()
 
-    # if args.debug_data:
-    #     logger.debug(f"{eval_set}")
-
     results = []
+    # run Archon on eval questions in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.parallel) as executor:
         results = list(
             tqdm(
@@ -78,9 +76,8 @@ def main(args):
                 total=len(eval_set),
             )
         )
-    # if args.debug_data:
-    #     print(results[0])
 
+    # update benchmark data
     eval_set = benchmark.process_results(results)
 
     ########### Save Output #########
@@ -108,12 +105,13 @@ def main(args):
 
     logger.info(f"Saving outputs to {output_path}.")
 
-    # save answers intermediately, not just at end
     benchmark.save_answers(output_path, eval_set)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
+    # arguments for gen_answers.py
 
     parser.add_argument(
         "--benchmark",
@@ -123,13 +121,15 @@ if __name__ == "__main__":
         help="The benchmark to use for evaluation",
     )
 
-    parser.add_argument("--config", type=str, help="Archon config to gen answers from")
+    parser.add_argument(
+        "--config", type=str, required=True, help="Archon config to gen answers from"
+    )
 
     parser.add_argument(
         "--output-dir",
         type=str,
         default="outputs/",
-        help="output directory",
+        help="output directory to save answers",
     )
 
     parser.add_argument(
@@ -147,6 +147,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug-verifier", action="store_true")
     parser.add_argument("--debug-archon", action="store_true")
     parser.add_argument("--debug-unit-test-generator", action="store_true")
+
     parser.add_argument(
         "--dataset-sample",
         type=float,

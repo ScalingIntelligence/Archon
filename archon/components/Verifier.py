@@ -41,14 +41,13 @@ class Verifier:
 
         return reasons_list
 
-    def generate_reasoning(self, messages, candidate, temperature=None):
+    def generate_reasoning(self, messages, candidate):
         """
         Generate reasoning for a candidate.
 
         Parameters:
         query (str): The input query.
         candidates (str): The candidate for reasoning
-        temperature (float, optional): Sampling temperature.
 
         Returns:
         list[str]: The reasonings for the candidate.
@@ -56,9 +55,6 @@ class Verifier:
         query = messages[-1]["content"]
         assert isinstance(query, str) and len(query) > 0
         assert isinstance(candidate, str)
-
-        if temperature is None:
-            temperature = self.temperature
 
         reasoning_prompt = make_verifier_reasoning_prompt(query, candidate)
 
@@ -80,7 +76,9 @@ class Verifier:
 
         for retry in range(10):
             try:
-                reasoning = self.verifier.generate_from_messages(messages)[0]
+                reasoning = self.verifier.generate_from_messages(
+                    messages, self.temperature
+                )[0]
 
                 if utils.DEBUG_VERIFIER:
                     logger.debug(f"Output from generated reasoning: {reasoning[:10]}")
@@ -106,9 +104,7 @@ class Verifier:
         # return "[Correct]" if "[Correct]" in generated_response else "[Incorrect]"
         return 1 if "[Correct]" in generated_response else 0
 
-    def verify_query_reasoning_pairs(
-        self, messages, candidate: str, reasoning: str, temperature=None
-    ):
+    def verify_query_reasoning_pairs(self, messages, candidate: str, reasoning: str):
         """
         Verify the query-reasoning pair.
 
@@ -116,7 +112,6 @@ class Verifier:
         query (str): The input query.
         candidate (str): The candidate generation.
         reasoning (str): The reasoning for the candidate.
-        temperature (float, optional): Sampling temperature.
 
         Returns:
         int: 1 if the reasoning is correct, 0 otherwise.
@@ -125,9 +120,6 @@ class Verifier:
         assert isinstance(query, str) and len(query) > 0
         assert isinstance(candidate, str) and len(candidate) > 0
         assert isinstance(reasoning, str) and len(reasoning) > 0
-
-        if temperature is None:
-            temperature = self.temperature
 
         verdict_prompt = make_verifier_verdict_prompt(query, candidate, reasoning)
 
@@ -149,7 +141,10 @@ class Verifier:
 
         for retry in range(10):
             try:
-                verdict = self.verifier.generate_from_messages(messages)[0]
+                verdict = self.verifier.generate_from_messages(
+                    messages, self.temperature
+                )[0]
+
                 if utils.DEBUG_VERIFIER:
                     logger.debug(f"Output from verifier: {verdict[-10:]}")
                 # breakpoint()

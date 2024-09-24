@@ -28,23 +28,19 @@ class Critic:
 
         print(f"Critic model initialized: {self.model_name}")
 
-    def evaluate_candidates(self, messages, candidates, temperature=None):
+    def evaluate_candidates(self, messages, candidates):
         """
         Evaluate the strengths and weaknesses of each candidate.
 
         Parameters:
         query (str): The input query.
         candidates (list of str): The list of candidate generations to evaluate.
-        temperature (float, optional): Sampling temperature.
 
         Returns:
         dict: A dictionary with strengths and weaknesses for each candidate.
         """
         assert isinstance(messages, list) and len(messages) > 0
         assert isinstance(candidates, list) and len(candidates) > 0
-
-        if temperature is None:
-            temperature = self.temperature
 
         query = messages[-1]["content"]
         critic_prompt = make_critic_prompt(query, candidates)
@@ -64,7 +60,7 @@ class Critic:
 
         for retry in range(10):
             try:
-                output = self.critic.generate_from_messages(messages)
+                output = self.critic.generate_from_messages(messages, self.temperature)
                 # breakpoint()
                 evaluations = self.parse_evaluation_output(output[0], candidates)
                 return evaluations

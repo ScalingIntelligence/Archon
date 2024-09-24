@@ -47,7 +47,6 @@ class Unit_Test_Evaluator:
         messages: list,
         candidate_responses: list,
         unit_tests: list,
-        temperature=None,
     ):
         """
         Generate unit tests for a given query.
@@ -56,7 +55,6 @@ class Unit_Test_Evaluator:
         init_input (list of dicts): The conversation.
         candidate_responses (list of str): The candidate responses to evaluate.
         unit_tests (list of str): The unit tests to evaluate.
-        temperature (float, optional): Sampling temperature.
 
         Returns:
         list of str: The top_k ranked generations.
@@ -85,9 +83,6 @@ class Unit_Test_Evaluator:
 
         ########################################
 
-        if temperature is None:
-            temperature = self.temperature
-
         candidate_responses = [response.strip() for response in candidate_responses]
         verdict_scores = []  # List of scores for each candidate response
 
@@ -114,7 +109,9 @@ class Unit_Test_Evaluator:
 
             for retry in range(10):
                 try:
-                    output = self.unit_test_evaluator.generate_from_messages(messages)
+                    output = self.unit_test_evaluator.generate_from_messages(
+                        messages, self.temperature
+                    )
                     unit_test_verdicts = self.parse_unit_tests_evaluations(
                         output[0], len(unit_tests)
                     )

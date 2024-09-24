@@ -1,0 +1,15 @@
+{
+    "name": "Llama-3-70B-chat",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Llama-3-70B-chat-hf",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

@@ -34,13 +34,12 @@ class Unit_Test_Generator:
 
         print(f"Unit_Test_Generator model initialized: {self.model_name}")
 
-    def generate_unit_tests(self, messages: list, temperature=None):
+    def generate_unit_tests(self, messages: list):
         """
         Generate unit tests for a given query.
 
         Parameters:
         init_input (list of dicts): The conversation.
-        temperature (float, optional): Sampling temperature.
 
         Returns:
         list: A list of generated unit tests.
@@ -53,9 +52,6 @@ class Unit_Test_Generator:
         assert isinstance(query, str) and len(query) > 0
 
         ########################################
-
-        if temperature is None:
-            temperature = self.temperature
 
         unit_test_generator_prompt = make_unit_test_generator_prompt(
             query, self.unit_test_cap
@@ -78,7 +74,9 @@ class Unit_Test_Generator:
 
         for retry in range(10):
             try:
-                output = self.unit_test_generator.generate_from_messages(messages)
+                output = self.unit_test_generator.generate_from_messages(
+                    messages, self.temperature
+                )
                 unit_tests = self.parse_unit_tests_output(output[0])
 
                 if utils.DEBUG_UNIT_TEST_GENERATOR:

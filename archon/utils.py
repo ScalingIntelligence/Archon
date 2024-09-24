@@ -27,18 +27,23 @@ class AllKeysUsedError(Exception):
 
 
 class keyHandler:
-    def __init__(self, api_key_file):
-        self.api_key_file = api_key_file
+    def __init__(self, api_key_data):
+        self.api_key_data = api_key_data
         self.all_api_keys = self._load_api_keys()
 
         self.key_indices = {key: 0 for key in self.all_api_keys}
 
     def _load_api_keys(self):
-        try:
-            with open(self.api_key_file, "r") as file:
-                return json.load(file)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"API key file '{self.api_key_file}' not found.")
+        if isinstance(self.api_key_data, dict):
+            self.all_api_keys = self.api_key_data
+        else:
+            try:
+                with open(self.api_key_data, "r") as file:
+                    return json.load(file)
+            except FileNotFoundError:
+                raise FileNotFoundError(
+                    f"API key file '{self.api_key_data}' not found."
+                )
 
     def get_current_key(self, api_key_type):
         if api_key_type not in self.all_api_keys:
@@ -97,16 +102,13 @@ def clean_messages(messages):
     return messages_alt
 
 
-def load_config(config_path=None):
+def load_config(config_path):
     """
     Load the configuration from a given file path.
     If no path is provided or the file doesn't exist, use the default configuration.
     """
-
-    config = config_path if config_path else DEFAULT_CONFIG
-
-    if os.path.isfile(config):
-        with open(config, "r") as file:
+    if os.path.isfile(config_path):
+        with open(config_path, "r") as file:
             config_file = json.load(file)
             return config_file
     else:
@@ -259,7 +261,7 @@ def generate_openai(model, messages, max_tokens=2048, temperature=0.7, **kwargs)
 
     client = openai.OpenAI(api_key=key)
 
-    for sleep_time in [1, 2, 4, 8, 16, 32]:
+    for sleep_time in [1, 2, 4, 8, 16, 32, 64]:
         try:
 
             if DEBUG:

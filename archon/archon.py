@@ -32,14 +32,19 @@ class Layer:
         self.initialize_layer()
 
     def initialize_layer(self):
+        """Initialize the layer and its components"""
 
         model_list = self.config
+
+        # deprecated compatibility with old configs
         if isinstance(self.config, dict):
             model_list = self.config["models"]
 
+        # initialize each component in the layer
         for model_config in model_list:
             model_type = model_config["type"]
 
+            # try fpr supported
             if model_type in MODEL_TYPE_MAP:
                 if model_type == "generator":
                     self.models.append(
@@ -49,7 +54,7 @@ class Layer:
                     self.models.append(MODEL_TYPE_MAP[model_type](model_config))
             else:
                 try:
-                    # trying for custom
+                    # try for custom
                     component = self.custom_components[model_config["type"]]
                     self.models.append(component(model_config))
                 except Exception as e:
@@ -64,19 +69,27 @@ class Layer:
         conv,
         prev_outputs=[],
         prev_critiques=None,
-        temperature=None,
         unit_tests=None,
+        custom_state={},
+        temperature=None,
     ):
+        """Have the layer process the conversation
 
-        query = conv[-1]["content"]
+        Args:
+            conv (list): A list of the conversation so far
+            prev_outputs (list, optional): The outputs from the previous layer. Defaults to [].
+            prev_critiques (list, optional): The critiques from the past layers. Defaults to None.
+            unit_tests (list, optional): Generate unit tests from previous layers. Defaults to None.
+            custom_state (dict, optional): A custom state that is passed between custom components. Defaults to {}.
+            temperature (float, optional): temperature ONLY for generators. Defaults to None.
+
+        Returns:
+            tuple: a tuple of output, output_critiques, unit_tests that will be passed to the next layer or final answer
+
+        """
+
         output = []
         output_critiques = None
-
-        # if self.prev_layer is not None:
-        #     prev_outputs, prev_critques = self.prev_layer.process()
-        # else:
-        #     prev_outputs = []
-        #     prev_critques = []
 
         if len(prev_outputs) > 32:
             logger.info(
@@ -113,7 +126,7 @@ class Layer:
             elif isinstance(
                 model, Ranker
             ):  # Ranking the responses from ensemble candidates
-                assert len(self.models) == 1 and isinstance(model, Ranker)
+                assert len(self.models) == 1
                 ranked_outputs, ranked_critiques = model.rank(
                     conv, prev_outputs, critiques=prev_critiques
                 )
@@ -123,8 +136,8 @@ class Layer:
             elif isinstance(
                 model, Critic
             ):  # Evaluating the responses from ensemble candidates
-                assert len(self.models) == 1 and isinstance(model, Critic)
-                evaluations = model.evaluate_candidates(conv, prev_outputs, temperature)
+                assert len(self.models) == 1
+                evaluations = model.evaluate_candidates(conv, prev_outputs)
 
                 output = prev_outputs
                 output_critiques = evaluations
@@ -133,8 +146,8 @@ class Layer:
                 model, Verifier
             ):  # Verifying the responses from ensemble candidates
 
-                assert len(self.models) == 1 and isinstance(model, Verifier)
-                
+                assert len(self.models) == 1
+
                 verified_outputs, verified_critiques = model.verify(
                     conv, prev_outputs, prev_critiques
                 )
@@ -144,18 +157,17 @@ class Layer:
             elif isinstance(
                 model, Unit_Test_Generator
             ):  # Generating unit tests for the responses from ensemble candidates
-                assert len(self.models) == 1 and isinstance(model, Unit_Test_Generator)
-                unit_tests = model.generate_unit_tests(conv, temperature)
+                assert len(self.models) == 1
+                unit_tests = model.generate_unit_tests(conv)
 
             elif isinstance(
                 model, Unit_Test_Evaluator
             ):  # Evaluating the responses from ensemble candidates using unit tests
-                assert len(self.models) == 1 and isinstance(model, Unit_Test_Evaluator)
+                assert len(self.models) == 1
                 ranked_outputs = model.evaluate_unit_tests(
                     messages=conv,
                     candidate_responses=prev_outputs,
                     unit_tests=unit_tests,
-                    temperature=temperature,
                 )
                 output.extend(ranked_outputs)
                 output_critiques = None
@@ -165,7 +177,7 @@ class Layer:
                     prev_outputs=prev_outputs,
                     prev_critiques=prev_critiques,
                     unit_tests=unit_tests,
-                    temperature=temperature,
+                    custom_state=custom_state,
                 )
                 output.extend(custom_output)
 
@@ -181,26 +193,26 @@ class Archon:
     of inference times techniques sequentially.
     """
 
-    def __init__(self, config, api_key_file=None):
+    def __init__(self, config, query_saves=False, api_key_data=None):
         """
         Initialize the Archon with configuration settings.
 
         Parameters:
         config (dict): Configuration dictionary containing layers and other settings.
-        api_key_file (str, optional): path to JSON of api_keys to use on generation. Defaults to None and use environment variables otherwise.
+        api_key_data (Union[dict, str], optional): api_key data to use on generation. Defaults to None and use environment variables otherwise.
         """
         self.config = config
         self.initialized = False
 
-        # attributes for custom 
+        # attributes for custom
         self.custom = config.get("custom", False)
         self.custom_components = {}
         self.custom_generators = {}
-        
+        self.query_saves = query_saves
 
-        if api_key_file:
+        if api_key_data:
             # initialize an object that is used in utils.py to handle key swapping
-            utils.KEYS = utils.keyHandler(api_key_file)
+            utils.KEYS = utils.keyHandler(api_key_data)
 
         # if custom, user has to manually initialize
         if not self.custom:
@@ -211,12 +223,12 @@ class Archon:
             )
 
     def add_component(self, name: str, component: Component):
-        """ add a custom component for use in archon configuration
+        """add a custom component for use in archon configuration
 
         Args:
             name (str): Name of component, must match name in archon config
             component (Component): Component to be called during inference time
-        """        
+        """
         self.custom_components[name] = component
 
     def add_generator(self, name: str, generator):
@@ -224,12 +236,11 @@ class Archon:
 
         Args:
             name (str): Name of generator, must match name in archon config
-            generator (): _description_
-        """        
+            generator (): generator function to be called from a generator
+        """
         self.custom_generators[name] = generator
 
     def initialize(self):
-        
         """
         Initialize the archon model, layer by layer.
         """
@@ -243,15 +254,15 @@ class Archon:
         self.initialized = True
 
     def generate(self, conv, temperature=None):
-        """_summary_
+        """generate a single output to the latest query in the conversation using your Archon config.
 
         Args:
             conv (list): A list of the conversation so far
-            temperature (float, optional): temperature to use for generation. Defaults to None.
+            temperature (float, optional): temperature to use for only generators. Defaults to None.
 
         Returns:
             str: generated answer to given conversation
-        """        
+        """
         if not self.initialized:
             raise Exception(
                 f"Initialize your archon model before generating. This most likely happens because you have a custom component"
@@ -268,7 +279,7 @@ class Archon:
                 message for message in conv
             ]
 
-        response, critique = self._generate(conv, temperature)
+        response, _, output_storage = self._generate(conv, temperature)
 
         if utils.DEBUG_ARCHON:
             if not len(response) > 0:
@@ -279,6 +290,26 @@ class Archon:
                 logger.error(
                     f"First element of response is not a string: {response[0]}"
                 )
+        
+        if self.query_saves:
+            import os
+            import json
+            from datetime import datetime
+
+            # Create the directory if it doesn't exist
+            save_dir = os.path.join('outputs', 'query_saves', self.config['name'])
+            os.makedirs(save_dir, exist_ok=True)
+
+            # Generate a unique filename using timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{self.config['name']}_{timestamp}.json"
+            filepath = os.path.join(save_dir, filename)
+
+            # Save output_storage to the file
+            with open(filepath, 'w') as f:
+                json.dump(output_storage, f, indent=2)
+
+            print(f"Output saved to: {filepath}")
 
         assert (
             len(response) > 0
@@ -286,9 +317,8 @@ class Archon:
             and isinstance(response, list)
         ), f"response not valid: {response}"
 
+        # random if multiple outputs
         if len(response) > 1:
-            # pick one random. Not want first element cause that can
-            # produce biased towards first one added to list because of speed or order in config
             response = [random.choice(response)]
 
         return response[0]
@@ -299,6 +329,7 @@ class Archon:
 
         Parameters:
         conv (str): list of dicts
+        temperature (float, optional): temperature to use for only generators. Defaults to None.
 
         Returns:
         list of str: The final generated responses.
@@ -310,6 +341,8 @@ class Archon:
         prev_output = []
         prev_critiques = []
         unit_tests = None
+        output_storage = []
+        custom_state = {}
 
         for i in range(len(self.layers)):
 
@@ -329,14 +362,24 @@ class Archon:
                 conv,
                 prev_output,
                 prev_critiques,
-                temperature=temperature,
                 unit_tests=unit_tests,
+                custom_state=custom_state,
+                temperature=temperature,
             )
 
             prev_output = layer_output
 
             # None if empty
             prev_critiques = layer_critique if layer_critique else None
+
+            if self.query_saves:
+                current_output = []
+                for i, layer_config in enumerate(layer.config):
+                    layer_config_with_output = layer_config.copy()
+                    layer_config_with_output['output'] = prev_output[i]
+                    layer_config_with_output['critique'] = prev_critiques
+                    current_output.append(layer_config_with_output)
+                output_storage.append(current_output)
 
         if len(prev_output) == 0:
             logger.warning("No output generated by Archon!")
@@ -346,4 +389,4 @@ class Archon:
             )
             prev_output = [random.choice(prev_output)]
 
-        return prev_output, prev_critiques
+        return prev_output, prev_critiques, output_storage

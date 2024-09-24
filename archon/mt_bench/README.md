@@ -56,10 +56,8 @@ Within `archon/`, you can run
 ```
 python3 gen_answers.py --config configs/archon-70Bx10_1_samples_then_fuser_with_Qwen2_72B.json --benchmark mt_bench  --parallel 24
 
-cd mt_bench/
+python3 mt_bench/eval_mt_bench.py --model-list archon-70Bx10_1_samples_then_fuser_with_Qwen2_72B --mode pairwise-baseline --parallel 32 --bench-name mt_bench --baseline-model archon-claude-3-5-sonnet-20240620
 
-python3 eval_mt_bench.py --model-list archon-70Bx10_1_samples_then_fuser_with_Qwen2_72B --mode pairwise-baseline --parallel 32 --bench-name mt_bench --baseline-model archon-claude-3-5-sonnet-20240620
-
-python3 show_mt_bench_result.py --mode pairwise-baseline --baseline-model archon-claude-3-5-sonnet-20240620
+python3 mt_bench/show_mt_bench_result.py --mode pairwise-baseline --baseline-model archon-claude-3-5-sonnet-20240620
 
 ```
