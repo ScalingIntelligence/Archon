@@ -6,18 +6,18 @@ from archon import Archon
 single_gpt_config = {
     "name": "gpt-4o-single",
     "layers": [
-         [
+        [
             {
-                "type": "model",
+                "type": "generator",
                 "model": "gpt-4o",
                 "model_type": "OpenAI_API",
                 "top_k": 1,
                 "temperature": 0.7,
                 "max_tokens": 2048,
-                "samples": 1
+                "samples": 1,
             }
         ]
-    ]
+    ],
 }
 
 
@@ -32,7 +32,7 @@ archon_gpt_config = {
                 "top_k": 1,
                 "temperature": 0.7,
                 "max_tokens": 2048,
-                "samples": 10
+                "samples": 10,
             }
         ],
         [
@@ -52,10 +52,10 @@ archon_gpt_config = {
                 "model_type": "OpenAI_API",
                 "temperature": 0.7,
                 "max_tokens": 2048,
-                "samples": 1
+                "samples": 1,
             }
-        ]
-    ]
+        ],
+    ],
 }
 
 #################################################
