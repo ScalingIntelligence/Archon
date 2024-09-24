@@ -1,0 +1,48 @@
+{
+    "name": "archon-claude-3-5-sonnet-sample_10_then_rank_top_5_then_critic_then_fuse",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 200000,
+                "samples": 5
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "claude-3-5-sonnet-20240620",
+                "ranker_batch_size": 16,
+                "model_type": "Anthropic_API",
+                "top_k": 5,
+                "temperature": 0.7,
+                "max_tokens": 200000,
+                "use_critiques": false
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "temperature": 0.7,
+                "max_tokens": 200000,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "temperature": 0.7,
+                "max_tokens": 200000,
+                "samples": 1
+            }
+        ]
+    ]
+}

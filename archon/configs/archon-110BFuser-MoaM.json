@@ -1,0 +1,78 @@
+{
+    "name": "archon-110BFuser-MoaM",
+    "layers": [
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "generator",
+                    "model": "microsoft/WizardLM-2-8x22B",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen1.5-110B-Chat",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen1.5-72B-Chat",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "meta-llama/Llama-3-70b-chat-hf",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "databricks/dbrx-instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        },
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen1.5-110B-Chat",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        }
+    ]
+}

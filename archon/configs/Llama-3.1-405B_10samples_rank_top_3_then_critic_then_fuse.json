@@ -1,0 +1,47 @@
+{
+    "name": "Llama-3.1-405B_10samples_rank_top_3_then_critic_then_fuse",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "ranker_batch_size": 16,
+                "model_type": "Together_API",
+                "top_k": 3,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "use_critiques": false
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

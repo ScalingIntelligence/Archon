@@ -1,0 +1,37 @@
+{
+    "name": "Llama-3.1-405B_with_critic_and_ranker",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 8192,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "ranker_batch_size": 16,
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "use_critiques": true
+            }
+        ]
+    ]
+}

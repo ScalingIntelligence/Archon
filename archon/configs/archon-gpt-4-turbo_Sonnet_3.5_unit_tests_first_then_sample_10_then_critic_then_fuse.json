@@ -1,0 +1,46 @@
+{
+    "name": "archon-gpt-4-turbo_Sonnet_3.5_unit_tests_first_then_sample_10_then_critic_then_fuse",
+    "layers": [
+        [
+            {
+                "type": "unit_test_generator",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "generator",
+                "model": "gpt-4-turbo",
+                "model_type": "OpenAI_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "gpt-4-turbo",
+                "model_type": "OpenAI_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "gpt-4-turbo",
+                "model_type": "OpenAI_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

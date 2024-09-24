@@ -1,0 +1,35 @@
+{
+    "name": "Wizard8x22_for_everything_10_samples_then_critic_then_fuser",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "microsoft/WizardLM-2-8x22B",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "microsoft/WizardLM-2-8x22B",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "microsoft/WizardLM-2-8x22B",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

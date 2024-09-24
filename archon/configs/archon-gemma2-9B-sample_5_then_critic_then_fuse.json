@@ -1,0 +1,36 @@
+{
+    "name": "archon-gemma2-9B-sample_5_then_critic_then_fuse",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "google/gemma-2-9b-it",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "google/gemma-2-9b-it",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "google/gemma-2-9b-it",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "name": "archon-70Bx9_70B_models_10_samples_top_only_then_ranker_top_5_then_fuse_with_Gemini_1.5_Pro",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            },
+            {
+                "type": "generator",
+                "model": "gemini-1.5-pro-001",
+                "model_type": "Google_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            },
+            {
+                "type": "generator",
+                "model": "gpt-4-turbo",
+                "model_type": "OpenAI_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "gemini-1.5-pro-001",
+                "model_type": "Google_API",
+                "ranker_batch_size": 16,
+                "top_k": 5,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "use_critiques": true
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "gemini-1.5-pro-001",
+                "model_type": "Google_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

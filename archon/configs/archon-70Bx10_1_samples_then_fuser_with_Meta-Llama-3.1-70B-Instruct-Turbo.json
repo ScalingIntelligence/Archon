@@ -1,0 +1,97 @@
+{
+    "name": "archon-70Bx10_1_samples_then_fuser_with_Meta-Llama-3.1-70B-Instruct-Turbo",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "deepseek-ai/deepseek-llm-67b-chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "microsoft/WizardLM-2-8x22B",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-72B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "meta-llama/Llama-3-70b-chat-hf",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "databricks/dbrx-instruct",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "garage-bAInd/Platypus2-70B-instruct",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

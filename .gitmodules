@@ -1,0 +1,6 @@
+[submodule "archon/mt_bench/FastChat"]
+	path = archon/mt_bench/FastChat
+	url = https://github.com/jonsaadfalcon/FastChat.git
+[submodule "archon/alpaca_eval/alpaca_eval"]
+	path = archon/alpaca_eval/alpaca_eval
+	url = https://github.com/tatsu-lab/alpaca_eval

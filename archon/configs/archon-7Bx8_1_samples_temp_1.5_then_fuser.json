@@ -1,0 +1,65 @@
+{
+    "name": "archon-7Bx8_1_samples_temp_1.5_then_fuser",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "snorkelai/Snorkel-Mistral-PairRM-DPO",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "mistralai/Mistral-7B-Instruct-v0.3",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "NousResearch/Nous-Hermes-2-Mistral-7B-DPO",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "togethercomputer/StripedHyena-Nous-7B",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "meta-llama/Llama-3-8b-chat-hf",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            },
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-7B-Chat",
+                "model_type": "Together_API",
+                "temperature": 1.5,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

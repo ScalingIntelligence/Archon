@@ -1,0 +1,102 @@
+{
+    "name": "archon-8-proposer-top3-ranker-qwen110b-fuser",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "deepseek-ai/deepseek-llm-67b-chat",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-72B-Chat",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "microsoft/WizardLM-2-8x22B",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "meta-llama/Llama-3-70b-chat-hf",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            },
+            {
+                "type": "generator",
+                "model": "databricks/dbrx-instruct",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 5
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "ranker_batch_size": 16,
+                "model_type": "Together_API",
+                "top_k": 3,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

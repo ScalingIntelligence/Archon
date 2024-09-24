@@ -1,0 +1,47 @@
+{
+    "name": "qwen110B_10samples_rank_top_3_then_critic_then_fuse",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 8192,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "ranker",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "ranker_batch_size": 16,
+                "model_type": "Together_API",
+                "top_k": 3,
+                "temperature": 0.7,
+                "max_tokens": 8192,
+                "use_critiques": false
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 8192,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "Qwen/Qwen1.5-110B-Chat",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 8192,
+                "samples": 1
+            }
+        ]
+    ]
+}

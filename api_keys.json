@@ -1,0 +1,14 @@
+{
+    "OPENAI_API_KEY": [],
+    "TOGETHER_API_KEY": [],
+    "ANTHROPIC_API_KEY": [],
+    "GROQ_API_KEY": [],
+    "AWS_ACCESS_KEY_ID": [],
+    "AWS_SECRET_ACCESS_KEY": [],
+    "AWS_REGION_NAME": [],
+    "GOOGLE_API_KEY": [],
+    "EXAMPLE_API_KEY": [
+        "key1",
+        "key2"
+    ]
+}

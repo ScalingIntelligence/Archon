@@ -1,0 +1,32 @@
+{
+    "name": "archon-1-110bFuser-1-110bM5S",
+    "layers": [
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen1.5-110B-Chat",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 5
+                }
+            ]
+        },
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen1.5-110B-Chat",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048
+                }
+            ]
+        }
+    ]
+}

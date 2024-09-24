@@ -1,0 +1,36 @@
+{
+    "name": "archon-llama-3.1-405B-sample_10_then_critic_with_sonnet_3.5_then_fuse_with_qwen2_72b",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}
