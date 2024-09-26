@@ -157,7 +157,7 @@ Alternatively, if no keys are provided, our system will look for environment var
 ```bibtex
 @misc{saadfalcon2024archonarchitecturesearchframework,
       title={Archon: An Architecture Search Framework for Inference-Time Techniques}, 
-      author={Jon Saad-Falcon and Adrian Gamarra Lafuente and Shlok Natarajan and Nahum Maru and Hristo Todorov and E. Kelly Buchanan and Mayee Chen and Neel Guha and Christopher Ré and Azalia Mirhoseini},
+      author={Jon Saad-Falcon and Adrian Gamarra Lafuente and Shlok Natarajan and Nahum Maru and Hristo Todorov and Etash Guha and E. Kelly Buchanan and Mayee Chen and Neel Guha and Christopher Ré and Azalia Mirhoseini},
       year={2024},
       eprint={2409.15254},
       archivePrefix={arXiv},
