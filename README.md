@@ -1,6 +1,9 @@
 # Archon: An Architecture Search Framework for Inference-Time Techniques
+
+This repository provides the accompanying code for [Archon: An Architecture Search Framework for Inference-Time Techniques](https://arxiv.org/abs/2409.15254)
+
 Inference-time techniques allow us to bolster the strengths of existing LMs by utilizing multiple sample calls and multiple LMs to increase system performance for a given task.
-Archon provides a modular framework for combining different inference-time techniques and LMs with just a JSON config file. Check out our [Quick Start](#quick-start) guide to get started or read our research paper [here](https://arxiv.org/abs/2409.15254)
+Archon provides a modular framework for combining different inference-time techniques and LMs with just a JSON config file. Check out our [Quick Start](#quick-start) guide to get started
 
 ![Archon Overview Diagram](readme_assets/archon_itas_diagram.svg)
 
