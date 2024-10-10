@@ -35,7 +35,7 @@ class keyHandler:
 
     def _load_api_keys(self):
         if isinstance(self.api_key_data, dict):
-            self.all_api_keys = self.api_key_data
+            return self.api_key_data
         else:
             try:
                 with open(self.api_key_data, "r") as file:
