@@ -1,0 +1,19 @@
+Llama-3-8B-Instruct-SkillMix:
+  prompt_template: "alpaca-7b/prompt.txt"
+  fn_completions: "vllm_local_completions"
+  completions_kwargs:
+    model_name: "PrincetonPLI/Llama-3-8B-Instruct-SkillMix"
+    batch_size: 900
+    model_kwargs:
+      torch_dtype: 'bfloat16'
+    max_new_tokens: 2048
+    temperature: 0.9
+    top_p: 1.0
+    do_sample: True
+    stop_token_ids:
+    - 128001
+    - 128009
+  pretty_name: "Llama-3-8B-Instruct-SkillMix"
+  link: "https://huggingface.co/PrincetonPLI/Llama-3-8B-Instruct-SkillMix"
+
+  

@@ -1,0 +1,298 @@
+# name: str
+#     model_name: str
+#     endpoints: default to null
+#         - api_base: str
+#           api_key: str
+#           api_version: str optional (only for azure)
+#     api_type: str
+#     tokenizer: str optional (to optimize token limits)
+#     parallel: int
+
+gpt-3.5-turbo-0125:
+    model_name: gpt-3.5-turbo-0125
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+gpt-4-0314:
+    model_name: gpt-4-0314
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+gpt-4-1106-preview:
+    model_name: gpt-4-1106-preview
+    endpoints: null
+    api_type: openai
+    parallel: 32
+
+gpt-4o-2024-05-13:
+    model_name: gpt-4o-2024-05-13
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+gpt-4-turbo-2024-04-09:
+    model_name: gpt-4-turbo-2024-04-09
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+gpt-4-turbo-20240620:
+    model_name: gpt-4-turbo-20240620
+    endpoints: null
+    api_type: openai
+    parallel: 8
+
+Qwen/Qwen1.5-72B-Chat:
+    model_name: "Qwen/Qwen1.5-72B-Chat"
+    models: ["Qwen/Qwen1.5-72B-Chat"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+claude-3-5-sonnet-20240620:
+    model_name: claude-3-5-sonnet-20240620
+    endpoints: null
+    api_type: anthropic
+    parallel: 8
+
+claude-3-opus-20240229:
+    model_name: claude-3-opus-20240229
+    endpoints: null
+    api_type: anthropic
+    parallel: 8
+
+Qwen/Qwen1.5-110B-Chat:
+    model_name: "Qwen/Qwen1.5-110B-Chat"
+    models: ["Qwen/Qwen1.5-110B-Chat"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+Qwen/Qwen2-72B-Instruct:
+    model_name: "Qwen/Qwen2-72B-Instruct"
+    models: ["Qwen/Qwen2-72B-Instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+microsoft/WizardLM-2-8x22B:
+    model_name: "microsoft/WizardLM-2-8x22B"
+    models: ["microsoft/WizardLM-2-8x22B"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+mistralai/Mixtral-8x22B-Instruct-v0.1:
+    model_name: "mistralai/Mixtral-8x22B-Instruct-v0.1"
+    models: ["mistralai/Mixtral-8x22B-Instruct-v0.1"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+meta-llama/Llama-3-70b-chat-hf:
+    model_name: "meta-llama/Llama-3-70b-chat-hf"
+    models: ["meta-llama/Llama-3-70b-chat-hf"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+databricks/dbrx-instruct:
+    model_name: "databricks/dbrx-instruct"
+    models: ["databricks/dbrx-instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: together_ai
+    parallel: 1
+
+Qwen/Qwen1.5-7B-Chat:
+    model_name: "Qwen/Qwen1.5-7B-Chat"
+    models: ["Qwen/Qwen1.5-7B-Chat"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+Nexusflow/Starling-LM-7B-beta:
+    model_name: "Nexusflow/Starling-LM-7B-beta"
+    models: ["Nexusflow/Starling-LM-7B-beta"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+meta-llama/Meta-Llama-3-8B-Instruct:
+    model_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+    models: ["meta-llama/Meta-Llama-3-8B-Instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+berkeley-nest/Starling-LM-7B-alpha:
+    model_name: "berkeley-nest/Starling-LM-7B-alpha"
+    models: ["berkeley-nest/Starling-LM-7B-alpha"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+teknium/OpenHermes-2.5-Mistral-7B:
+    model_name: "teknium/OpenHermes-2.5-Mistral-7B"
+    models: ["teknium/OpenHermes-2.5-Mistral-7B"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+mistralai/Mistral-7B-Instruct-v0.2:
+    model_name: "mistralai/Mistral-7B-Instruct-v0.2"
+    models: ["mistralai/Mistral-7B-Instruct-v0.2"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+cognitivecomputations/dolphin-2.2.1-mistral-7b:
+    model_name: "cognitivecomputations/dolphin-2.2.1-mistral-7b"
+    models: ["cognitivecomputations/dolphin-2.2.1-mistral-7b"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+microsoft/Phi-3-mini-4k-instruct:
+    model_name: "microsoft/Phi-3-mini-4k-instruct"
+    models: ["microsoft/Phi-3-mini-4k-instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+HuggingFaceH4/zephyr-7b-beta:
+    model_name: "HuggingFaceH4/zephyr-7b-beta"
+    models: ["HuggingFaceH4/zephyr-7b-beta"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+microsoft/Phi-3-small-8k-instruct:
+    model_name: "microsoft/Phi-3-small-8k-instruct"
+    models: ["microsoft/Phi-3-small-8k-instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+
+
+
+Qwen/Qwen2-7B-Instruct:
+    model_name: "Qwen/Qwen2-7B-Instruct"
+    models: ["Qwen/Qwen2-7B-Instruct"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+princeton-nlp/Llama-3-Instruct-8B-SimPO:
+    model_name: "princeton-nlp/Llama-3-Instruct-8B-SimPO"
+    models: ["princeton-nlp/Llama-3-Instruct-8B-SimPO"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+princeton-nlp/Llama-3-Instruct-8B-IPO:
+    model_name: "princeton-nlp/Llama-3-Instruct-8B-IPO"
+    models: ["princeton-nlp/Llama-3-Instruct-8B-IPO"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+princeton-nlp/Llama-3-Instruct-8B-RDPO:
+    model_name: "princeton-nlp/Llama-3-Instruct-8B-RDPO"
+    models: ["princeton-nlp/Llama-3-Instruct-8B-RDPO"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+princeton-nlp/Llama-3-Instruct-8B-DPO:
+    model_name: "princeton-nlp/Llama-3-Instruct-8B-DPO"
+    models: ["princeton-nlp/Llama-3-Instruct-8B-DPO"]
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: huggingface
+    parallel: 1
+
+MoA_Ensemble_Three_Rounds:
+    aggregator_model: "Qwen/Qwen1.5-110B-Chat"
+    reference_models: ["Qwen/Qwen1.5-72B-Chat", "Qwen/Qwen1.5-110B-Chat", "microsoft/WizardLM-2-8x22B","mistralai/Mixtral-8x22B-Instruct-v0.1", "meta-llama/Llama-3-70b-chat-hf", "databricks/dbrx-instruct"]
+    rounds: 3
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: MoA
+    parallel: 1
+
+MoA_Ensemble_One_Round:
+    aggregator_model: "Qwen/Qwen1.5-110B-Chat"
+    reference_models: ["Qwen/Qwen1.5-72B-Chat", "Qwen/Qwen1.5-110B-Chat", "microsoft/WizardLM-2-8x22B","mistralai/Mixtral-8x22B-Instruct-v0.1", "meta-llama/Llama-3-70b-chat-hf", "databricks/dbrx-instruct"]
+    rounds: 1
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: MoA
+    parallel: 1
+
+MoA_Ensemble_Three_Round_with_Wizard_5x_and_Qwen_1.5_110B_Aggregator:
+    aggregator_model: "Qwen/Qwen1.5-110B-Chat"
+    reference_models: ["microsoft/WizardLM-2-8x22B", "microsoft/WizardLM-2-8x22B", "microsoft/WizardLM-2-8x22B", "microsoft/WizardLM-2-8x22B", "microsoft/WizardLM-2-8x22B", "microsoft/WizardLM-2-8x22B"]
+    rounds: 3
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: MoA
+    parallel: 1
+
+MoA_Ensemble_Three_Round_with_Qwen_1.5_110B_5x_and_Qwen_1.5_110B_Aggregator:
+    aggregator_model: "Qwen/Qwen1.5-110B-Chat"
+    reference_models: ["Qwen/Qwen1.5-110B-Chat", "Qwen/Qwen1.5-110B-Chat", "Qwen/Qwen1.5-110B-Chat", "Qwen/Qwen1.5-110B-Chat", "Qwen/Qwen1.5-110B-Chat", "Qwen/Qwen1.5-110B-Chat"]
+    rounds: 3
+    candidate_count: 1
+    temperature: 0.7
+    endpoints: null
+    api_type: MoA
+    parallel: 1

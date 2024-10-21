@@ -3,8 +3,10 @@
 This repository provides the accompanying code for [Archon: An Architecture Search Framework for Inference-Time Techniques](https://arxiv.org/abs/2409.15254)
 
 Inference-time techniques allow us to bolster the strengths of existing LMs by utilizing multiple sample calls and multiple LMs to increase system performance for a given task.
-Archon provides a modular framework for combining different inference-time techniques and LMs with just a JSON config file. Check out our [Quick Start](#quick-start) guide to get started
+Archon provides a modular framework for combining different inference-time techniques and LMs with just a JSON config file. Check out our [Quick Start](#quick-start) guide to get started.
 ![Archon Overview Diagram](readme_assets/archon_itas_diagram.svg)
+
+
 
 
 ## Table of Contents
@@ -46,7 +48,7 @@ pip install -r requirements.txt
 We recommend you work within the `archon/` directory.
 Archon can be instantiated via the [Archon](https://github.com/ScalingIntelligence/Archon/blob/main/archon/archon.py#L176) class in `archon.py`. Get started by cloning the repository and navigating to our [quickstart.py](https://github.com/ScalingIntelligence/Archon/blob/main/archon/quickstart.py) or creating your own starter file that imports our Archon class as shown below: 
 ```python
-from archon import Archon
+from archon.completions import Archon
 ```
 ## Archon Overview
 Our Archon codebase provides users with the ability to run Archon configurations. We highly recommend reading our research paper [here](https://arxiv.org/abs/2409.15254).
@@ -149,14 +151,34 @@ This will run the model structure specified in your config file against the ques
 To add your benchmark, you must edit the benchmarks.py file and add your benchmark class. The 'Benchmark' class can be used as a base class for interfacing between gen_answers.py and your benchmark. Lastly, make sure to add your evaluation to 'BENCHMARK_CLASSES' so it can be used as an argument in gen_answers.py
 
 ## Key Handling
+Archon supports a couple different ways of setting your API Keys:
 
-For Archon to use your API keys, you can pass a JSON file path or a dictionary that holds your keys. An example of the expected file/dictionary format is seen in [api_keys.json](api_keys.json). For example. you would initialize Archon with:
+#### 1. Set api keys in a .env file (Recommended)
+Archon uses [python-dotenv](https://pypi.org/project/python-dotenv/) to load environment variables from a `.env` file. Create a `.env` file at the root of your repo with your api keys. 
+```
+export ANTHROPIC_API_KEY=<your_api_key>
+export OPENAI_API_KEY=<your_api_key>
+export TOGETHER_API_KEY=<your_api_key>
+export TOGETHER_API_KEY_2=<your_api_key>
+export TOGETHER_API_KEY_3=<your_api_key>
+```
+The numbers at the end of the api keys are an example of how setup a `.env` file to take advantage of Archon's [key swapping](#key-swapping) feature.
+
+#### 2. Set api keys using an api_keys.json file
+You can pass a JSON file path or a dictionary that holds your keys. An example of the expected file/dictionary format is seen in [api_keys.json](api_keys.json). For example. you would initialize Archon with:
 ```python
 archon = Archon(config, "path_to_keys/file.json")
 ```
-We have a built-in system that swaps through your keys if you hit a rate limit. We found this helpful when working with APIs.
+*Warning: FastChat will not work with just this approach and would require having api keys set as an environment variable. There may be other benchmarks that function this way which is why option 1 is preferred.* 
 
-Alternatively, if no keys are provided, our system will look for environment variables corresponding to the keys in `api_keys.json`.
+#### 3. Set api keys using a dictionary that holds your keys
+Instead of passing in a path to a JSON file, you can directly pass in a dictionary object with the same structure as the provided example [api_keys.json](api_keys.json).
+```python
+keys_dict = {...}
+archon = Archon(config, keys_dict)
+```
+### Key Swapping
+Archon has a built-in system that swaps through your keys if you hit a rate limit. We found this helpful when working with APIs. The `_<number>` suffix for the API keys specified in your `.env` file denote the order the keys are tried. Essentially, Archon will use the first key (with no number at the end) until a rate limit is hit and then switch to `API_KEY_2` if it's available. This process repeats as Archon cycles through your available keys. The process works similarly for the dictionary/JSON approach using the keys stored in each key-list pair.
 
 ## Citation
 ```bibtex
