@@ -1,0 +1,13 @@
+{
+    "name": "archon-vllm-example",
+    "layers": [
+        {
+            "type": "generator",
+            "model": "facebook/opt-125m",
+            "model_type": "vLLM",
+            "temperature": 0.7,
+            "max_tokens": 2048,
+            "samples": 1
+        }
+    ]
+}

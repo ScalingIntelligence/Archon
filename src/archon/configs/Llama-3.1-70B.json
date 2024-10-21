@@ -1,0 +1,15 @@
+{
+    "name": "Llama-3.1-70B",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

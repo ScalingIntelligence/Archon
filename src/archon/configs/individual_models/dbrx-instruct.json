@@ -1,0 +1,16 @@
+{
+    "name": "dbrx-instruct",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "databricks/dbrx-instruct",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

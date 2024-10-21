@@ -1,0 +1,196 @@
+{
+    "name": "MoA_Qwen2_all_replace",
+    "layers": [
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "generator",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        },
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        },
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                },
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        },
+        {
+            "branches": 1,
+            "models": [
+                {
+                    "type": "fuser",
+                    "model": "Qwen/Qwen2-72B-Instruct",
+                    "model_type": "Together_API",
+                    "top_k": 1,
+                    "temperature": 0.7,
+                    "max_tokens": 2048,
+                    "samples": 1
+                }
+            ]
+        }
+    ]
+}

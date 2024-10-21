@@ -1,0 +1,37 @@
+{
+    "name": "Llama-3.1-405B_10_samples_then_unit_test_generation_with_llama_3.1_405B_then_fuse_with_llama_3.1_70B",
+    "layers": [
+        [
+            {
+                "type": "unit_test_generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1,
+                "unit_test_cap": 5
+            }
+        ],
+        [
+            {
+                "type": "generator",
+                "model": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 10
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+                "model_type": "Together_API",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1,
+                "top_k": 1
+            }
+        ]
+    ]
+}

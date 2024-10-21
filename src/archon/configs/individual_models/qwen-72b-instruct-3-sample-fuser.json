@@ -1,0 +1,27 @@
+{
+    "name": "Qwen2-72B-Instruct-3-sample-fuser",
+    "layers": [
+        [
+            {
+                "type": "generator",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 3
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "Qwen/Qwen2-72B-Instruct",
+                "model_type": "Together_API",
+                "top_k": 1,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ]
+    ]
+}

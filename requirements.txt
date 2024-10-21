@@ -18,4 +18,3 @@ alpaca_eval==0.6.5
 bayesian-optimization==1.5.1
 numpy
 docker==7.1.0
-archon-ai

@@ -1,0 +1,24 @@
+
+{
+    "model_top_k_choices": [1, 2],
+    "sample_top_k_choices": [1],
+    "fuser_layer_1_choices": [0],
+    "fuser_layer_2_choices": [0],
+    "fuser_layer_3_choices": [0],
+    "maximum_inference_calls": 20,
+    "models_available": ["configs/individual_models/claude-3-haiku-20240307.json", "configs/individual_models/gpt-4-turbo-2024-04-09.json"], 
+    
+    "base_output_directory": "outputs/itas_algorithms/",
+    "benchmark": "arena_hard_auto",
+    "judge_model": "configs/individual_models/gpt-4o-mini.json",
+    "baseline_model": "configs/individual_models/gpt-4-turbo-20240620.json",
+    "dataset_sample_for_power_ranking": 0.0125,
+    "dataset_sample_for_search": 0.0125,
+    "dataset_sample_for_final_ranking": 0.0125,
+    
+    "search_algorithm_choice": "bayesian_optimization", 
+    "number_of_archon_configs_for_final_ranking": 10,
+    "random_search_iterations": 10,
+    "init_points": 1,
+    "n_iter": 1
+}

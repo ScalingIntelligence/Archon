@@ -1,0 +1,48 @@
+name: judgment config file for Arena Hard
+
+bench_name: arena_hard_auto
+
+# Arena Hard default
+judge_model: gpt-4-turbo-2024-04-09
+reference: False # Optional
+ref_model: null
+
+baseline: True
+baseline_model: claude-3-5-sonnet-20240620
+
+pairwise: True
+temperature: 0
+max_tokens: 4096
+
+regex_pattern: \[\[([AB<>=]+)\]\]
+number_of_judgment_attempts: 2
+system_prompt: "Please act as an impartial judge and evaluate the quality of the responses provided by two AI assistants to the user prompt displayed below. You will be given assistant A's answer and assistant B's answer. Your job is to evaluate which assistant's answer is better.\n\nBegin your evaluation by generating your own answer to the prompt. You must provide your answers before judging any answers.\n\nWhen evaluating the assistants' answers, compare both assistants' answers with your answer. You must identify and correct any mistakes or inaccurate information.\n\nThen consider if the assistant's answers are helpful, relevant, and concise. Helpful means the answer correctly responds to the prompt or follows the instructions. Note when user prompt has any ambiguity or more than one interpretation, it is more helpful and appropriate to ask for clarifications or more information from the user than providing an answer based on assumptions. Relevant means all parts of the response closely connect or are appropriate to what is being asked. Concise means the response is clear and not verbose or excessive.\n\nThen consider the creativity and novelty of the assistant's answers when needed. Finally, identify any missing important information in the assistants' answers that would be beneficial to include when responding to the user prompt.\n\nAfter providing your explanation, you must output only one of the following choices as your final verdict with a label:\n\n1. Assistant A is significantly better: [[A>>B]]\n2. Assistant A is slightly better: [[A>B]]\n3. Tie, relatively the same: [[A=B]]\n4. Assistant B is slightly better: [[B>A]]\n5. Assistant B is significantly better: [[B>>A]]\n\nExample output: \"My final verdict is tie: [[A=B]]\"."
+
+prompt_template: ["<|User Prompt|>\n{question_1}\n\n<|The Start of Assistant A's Answer|>\n{answer_1}\n<|The End of Assistant A's Answer|>\n\n<|The Start of Assistant B's Answer|>\n{answer_2}\n<|The End of Assistant B's Answer|>"]
+
+# Add your model below for evaluation
+model_list:
+  - gpt-4-0314
+  - Qwen1.5-72B-Chat
+  - archon-70Bx8_1_samples_then_critic_then_rank_top5_then_fuser
+  - gpt-4-turbo-2024-04-09
+  - claude-3-5-sonnet-20240620
+  - archon-1-110bFuser-1-110bRanker5-1-110BCritic-8-70BM
+  - archon-gpt-4o-sample_10_then_rank_top_5_then_critic_then_fuse
+  - archon-claude-3-5-sonnet-sample_10_then_critic_then_fuse
+  - archon-70Bx8_1_samples_then_critic_then_fuser_with_Qwen2_72B
+  - archon-70Bx8_1_samples_then_rank_top5_then_critic_then_fuser_with_Qwen2_72B
+  - Meta-Llama-3.1-405B-Instruct-Turbo
+  - archon-70Bx8_1_samples_for_three_layers_then_critic_then_fuser
+  - 7B_models_1_sample_then_qwen_110B_ranker_then_qwen_110B_critic_then_qwen_110B_fuser
+  - archon-1-WizardLMFuser-1-110bRanker5-1-110BCritic-8-70BM
+  - archon-70Bx8_1_samples_then_rank_top5_then_critic_with_llama3.1_70B_then_fuser_with_Qwen2_72B
+  - claude-3-opus-20240229
+  - gpt-4o-2024-05-13
+  - WizardLM-2-8x22B
+  - Wizard8x22_10_samples_then_critic_then_fuser_with_Qwen_1.5_110B
+  - archon-70Bx8_1_samples_then_rank_top5_then_critic_then_fuser_with_Qwen1.5_110B
+  - archon-claude-3-5-sonnet-20240620
+  - archon-MoA-lite
+  - MoA_three_proposer_layers_of_70Bx8_models_with_Qwen2_72B_for_aggregation_layer
+  - archon-llama-3.1-405B-sample_10_then_critic_with_sonnet_3.5_then_fuse_with_qwen2_72b

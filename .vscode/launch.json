@@ -1,0 +1,71 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Quickstart",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "module": "archon.completions.quickstart",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Gen Answers Main",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "module": "archon.completions.gen_answers",
+            "console": "integratedTerminal",
+            "args": ["--benchmark", "arena_hard_auto", "--config", "archon/configs/individual_models/claude-3-5-sonnet-20240620.json", "--output-dir", "outputs", "--parallel", "16", "--debug-data"]
+        },
+        {
+            "name": "arena show result",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "module": "archon.benchmarks.arena_hard_auto.show_arena_hard_auto_result",
+            "console": "integratedTerminal",
+            "args": ["--baseline", "claude-3-5-sonnet-20240620", "--judge-name", "gpt-4-turbo-20240620"]
+        },
+        {
+            "name": "Gen Judgment Arena",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "module": "archon.benchmarks.arena_hard_auto.gen_judgment",
+            "console": "integratedTerminal",
+            "args": ["--baseline", "claude-3-5-sonnet-20240620", "--model-list", "archon-gpt-4o-sample_10_then_rank_top_5_then_critic_then_fuse"]
+        },
+        {
+            "name": "Power Ranker",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src",
+            "module": "archon.itas_algorithms.power_ranker",
+            "args": [
+                "--benchmark_name", "mt_bench",
+                "--judge_path", "archon/configs/individual_models/gpt-4-turbo-2024-04-09.json",
+                "--output_dir", "outputs",
+                "--baseline_path", "archon/configs/individual_models/gpt-4-turbo-2024-04-09.json",
+                "--model_list_paths", 
+                "archon/configs/individual_models/gpt-4-turbo-2024-04-09.json", 
+                "archon/configs/individual_models/claude-3-haiku-20240307.json",
+                "archon/configs/individual_models/dbrx-instruct.json",
+                "--dataset_sample", "0.1"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "CLAS",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/archon",
+            "program": "itas_algorithm.py",
+            "console": "integratedTerminal",
+            "args": ["--search-config", "itas_algorithms/search_configs/example_search_config.json"]
+        }
+    ]
+}

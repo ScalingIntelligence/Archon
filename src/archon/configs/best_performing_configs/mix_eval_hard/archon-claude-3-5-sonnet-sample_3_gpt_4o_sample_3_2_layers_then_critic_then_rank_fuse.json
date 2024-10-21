@@ -1,0 +1,90 @@
+{  
+    "name": "archon-claude-3-5-sonnet-sample_3_gpt_4o_sample_3_2_layers_then_critic_then_rank_fuse",
+    "layers": [
+        [   
+
+            {
+                "type": "generator",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "checkpoint": "",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 3
+            },
+            {
+                "type": "generator",
+                "model": "gpt-4o",
+                "model_type": "OpenAI_API",
+                "checkpoint": "",
+                "temperature": 0.7,
+                "max_tokens": 2048, 
+                "samples": 3
+            }
+        ],
+        [
+            {
+                "type": "critic",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "checkpoint": "",
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "samples": 1
+            }
+        ],
+        [   
+        {
+            "type": "fuser",
+            "model": "claude-3-5-sonnet-20240620",
+            "model_type": "Anthropic_API",
+            "checkpoint": "",
+            "temperature": 0.7,
+            "max_tokens": 2048,
+            "samples": 3
+        },
+        {
+            "type": "fuser",
+            "model": "gpt-4o",
+            "model_type": "OpenAI_API",
+            "checkpoint": "",
+            "temperature": 0.7,
+            "max_tokens": 2048, 
+            "samples": 3
+        }
+    ],
+    [
+        {
+            "type": "critic",
+            "model": "claude-3-5-sonnet-20240620",
+            "model_type": "Anthropic_API",
+            "checkpoint": "",
+            "temperature": 0.7,
+            "max_tokens": 2048,
+            "samples": 1
+        }
+    ],
+        [
+            {
+                "type": "ranker",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "top_k": 5,
+                "temperature": 0.7,
+                "max_tokens": 2048,
+                "use_critiques": false
+            }
+        ],
+        [
+            {
+                "type": "fuser",
+                "model": "claude-3-5-sonnet-20240620",
+                "model_type": "Anthropic_API",
+                "checkpoint": "",
+                "temperature": 0.7,
+                "max_tokens": 20000,
+                "samples": 1
+            }
+        ]
+    ]
+}
