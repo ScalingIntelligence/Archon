@@ -178,7 +178,7 @@ keys_dict = {...}
 archon = Archon(config, keys_dict)
 ```
 ### Key Swapping
-Archon has a built-in system that swaps through your keys if you hit a rate limit. We found this helpful when working with APIs. The `_<number>` suffix for the API keys specified in your `.env` file denote the order the keys are tried. Essentially, Archon will use the first key (with no number at the end) until a rate limit is hit and then switch to `API_KEY_2` if it's available. This process repeats as Archon cycles through your available keys. The process works similarly for the dictionary/JSON approach using the keys stored in each key-list pair.
+Archon has a built-in system that swaps through your keys if you hit a rate limit. We found this helpful when making an extensive number of inference calls. The `_<number>` suffix for the API keys specified in your `.env` file denote the order the keys are tried. Essentially, Archon will use the first key (with no number at the end) until a rate limit is hit and then switch to `API_KEY_2` if it's available. This process repeats as Archon cycles through your available keys. The process works similarly for the dictionary/JSON approach using the keys stored in each key-list pair.
 
 ## Citation
 ```bibtex
