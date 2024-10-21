@@ -19,7 +19,6 @@ single_gpt_config = {
     ],
 }
 
-
 archon_gpt_config = {
     "name": "archon-gpt-multi-model",
     "layers": [

@@ -46,8 +46,11 @@ def main(args):
     if utils.DEBUG:
         logger.debug(f"{archon_config=}")
 
+    api_key_data = None
+    if hasattr(args, 'api_keys'):
+        api_key_data = args.api_keys
     # initialize Archon
-    archon = Archon(config=archon_config, api_key_data=args.api_keys)
+    archon = Archon(config=archon_config, api_key_data=api_key_data)
     logger.info("Finished initializing archon")
 
     benchmark = load_benchmark(
