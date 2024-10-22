@@ -1,4 +1,4 @@
-from .archon import Archon
+from archon.completions import Archon
 
 # make sure to set your OPENAI_API_KEY environment variable
 # Initialize Archon
@@ -18,6 +18,7 @@ single_gpt_config = {
         ]
     ],
 }
+
 
 archon_gpt_config = {
     "name": "archon-gpt-multi-model",

@@ -1,11 +1,12 @@
 import re
 from .Generator import Generator
+from .Component import Component
 from .. import utils
 from loguru import logger
 from .prompts import make_unit_test_generator_prompt
 
 
-class Unit_Test_Generator:
+class Unit_Test_Generator(Component):
     def __init__(self, config):
         """
         Initialize the Unit_Test_Generator with configuration settings.
@@ -32,12 +33,29 @@ class Unit_Test_Generator:
 
         print(f"Unit_Test_Generator model initialized: {self.model_name}")
 
-    def generate_unit_tests(self, conversation: list):
+    def run(self, conversation, prev_state, state):
         """
-        Generate unit tests for a given query.
+        Run a component and updates the state accordingly.
+
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        unit_tests = self.generate_unit_tests(conversation)
+        
+        state["unit_tests"].extend(unit_tests)
+
+        return
+
+    def generate_unit_tests(self, conversation: list) -> list:
+        """
+        Generate unit tests for a given conversation.
 
         Parameters:
-        conversation (list of dicts): The conversation.
+        conversation (list): The conversation to generate unit testst for.
 
         Returns:
         list: A list of generated unit tests.

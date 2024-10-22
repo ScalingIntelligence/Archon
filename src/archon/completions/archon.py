@@ -11,8 +11,10 @@ from .components import (
 from . import utils
 from loguru import logger
 import random
+from collections import defaultdict
+from typing import Any, Tuple
 
-MODEL_TYPE_MAP = {
+COMPONENT_TYPE_MAP = {
     "generator": Generator,
     "ranker": Ranker,
     "fuser": Fuser,
@@ -24,9 +26,17 @@ MODEL_TYPE_MAP = {
 
 
 class Layer:
-    def __init__(self, layer_config, custom_components, custom_generators):
+    def __init__(self, layer_config: list, custom_components: list, custom_generators: list):
+        """ Initialize the archon layer
+
+        Args:
+            layer_config (list): A list of dicts, where each dict is a component of the layer
+            custom_components (list): A list of custom components
+            custom_generators (list): A list of custom generators 
+        """        
+
         self.config = layer_config
-        self.models = []
+        self.components = []
         self.custom_components = custom_components
         self.custom_generators = custom_generators
         self.initialize_layer()
@@ -34,146 +44,73 @@ class Layer:
     def initialize_layer(self):
         """Initialize the layer and its components"""
 
-        model_list = self.config
+        component_list = self.config
 
         # deprecated compatibility with old configs
         if isinstance(self.config, dict):
-            model_list = self.config["models"]
+            component_list = self.config["models"]
 
         # initialize each component in the layer
-        for model_config in model_list:
-            model_type = model_config["type"]
+        for component_config in component_list:
+            component_type = component_config["type"]
 
             # try fpr supported
-            if model_type in MODEL_TYPE_MAP:
-                if model_type == "generator":
-                    self.models.append(
-                        MODEL_TYPE_MAP[model_type](model_config, self.custom_generators)
+            if component_type in COMPONENT_TYPE_MAP:
+                if component_type == "generator":
+                    self.components.append(
+                        COMPONENT_TYPE_MAP[component_type](
+                            component_config, self.custom_generators
+                        )
                     )
                 else:
-                    self.models.append(MODEL_TYPE_MAP[model_type](model_config))
+                    self.components.append(
+                        COMPONENT_TYPE_MAP[component_type](component_config)
+                    )
             else:
                 try:
                     # try for custom
-                    component = self.custom_components[model_config["type"]]
-                    self.models.append(component(model_config))
+                    component = self.custom_components[component_config["type"]]
+                    self.components.append(component(component_config))
                 except Exception as e:
                     logger.error(e)
                     raise ValueError(
-                        f"Unsupported object type: {model_config['type']}. Check config (set Custom to true), add custom component before initiliaziation, and make sure custom component has been correctly made"
+                        f"Unsupported object type: {component_config['type']}. Check config (set Custom to true), add custom component before initiliaziation, and make sure custom component has been correctly made"
                     )
-        logger.info(f"Initialized layer with {len(self.models)} models")
+        logger.info(f"Initialized layer with {len(self.components)} components")
 
-    def process(
-        self,
-        conv,
-        prev_outputs=[],
-        prev_critiques=None,
-        unit_tests=None,
-        custom_state={},
-        temperature=None,
-    ):
-        """Have the layer process the conversation
+    def process(self, conv: list, prev_state: dict):
+        """ Have the layer process the conversation
 
         Args:
             conv (list): A list of the conversation so far
-            prev_outputs (list, optional): The outputs from the previous layer. Defaults to [].
-            prev_critiques (list, optional): The critiques from the past layers. Defaults to None.
-            unit_tests (list, optional): Generate unit tests from previous layers. Defaults to None.
-            custom_state (dict, optional): A custom state that is passed between custom components. Defaults to {}.
-            temperature (float, optional): temperature ONLY for generators. Defaults to None.
+            prev_state (dict): The state of the previous layer
 
         Returns:
-            tuple: a tuple of output, output_critiques, unit_tests that will be passed to the next layer or final answer
+            dict: returns a new state to send to the next layer. 
+                All unchanged values from the previous layer is passed to this layer
+        """    
 
-        """
+        # default to list, although you can also store variables
+        current_state = defaultdict(list)
 
-        output = []
-        output_critiques = None
-
-        if len(prev_outputs) > 32:
+        prev_candidates_len = len(prev_state["candidates"])
+        if prev_candidates_len > 32:
             logger.info(
-                f"WARNING: Previous inputs of length ({len(prev_outputs)}) are too long! Will likely exceed context window of generator LMs"
+                f"WARNING: Previous inputs of length ({prev_candidates_len}) are too long! Will likely exceed context window of generator LMs"
             )
 
-        for model in self.models:
-
-            if isinstance(model, Generator):  # Generating responses from ensemble
-                assert (
-                    len(prev_outputs) == 0
-                ), "Likely that model type not in first layer. Check config"
-
-                output.extend(model.generate_from_messages(conv, temperature))
-
-            elif isinstance(
-                model, Fuser
-            ):  # Generating fused responses from ensemble candidates
-
-                fused_output = model.fuse(conv, prev_outputs, critiques=prev_critiques)
-                output.extend(fused_output)
-
-            elif isinstance(
-                model, Ranker
-            ):  # Ranking the responses from ensemble candidates
-                assert len(self.models) == 1
-                ranked_outputs, ranked_critiques = model.rank(
-                    conv, prev_outputs, critiques=prev_critiques
-                )
-                output.extend(ranked_outputs)
-                output_critiques = ranked_critiques
-
-            elif isinstance(
-                model, Critic
-            ):  # Evaluating the responses from ensemble candidates
-                assert len(self.models) == 1
-                evaluations = model.evaluate_candidates(conv, prev_outputs)
-
-                output = prev_outputs
-                output_critiques = evaluations
-
-            elif isinstance(
-                model, Verifier
-            ):  # Verifying the responses from ensemble candidates
-
-                assert len(self.models) == 1
-
-                verified_outputs, verified_critiques = model.verify(
-                    conv, prev_outputs, prev_critiques
-                )
-                output.extend(verified_outputs)
-                output_critiques = verified_critiques
-
-            elif isinstance(
-                model, Unit_Test_Generator
-            ):  # Generating unit tests for the responses from ensemble candidates
-                assert len(self.models) == 1
-                unit_tests = model.generate_unit_tests(conv)
-
-            elif isinstance(
-                model, Unit_Test_Evaluator
-            ):  # Evaluating the responses from ensemble candidates using unit tests
-                assert len(self.models) == 1
-                ranked_outputs = model.evaluate_unit_tests(
-                    messages=conv,
-                    candidate_responses=prev_outputs,
-                    unit_tests=unit_tests,
-                )
-                output.extend(ranked_outputs)
-                output_critiques = None
-            elif isinstance(model, Component):
-                custom_output = model.generate(
-                    messages=conv,
-                    prev_outputs=prev_outputs,
-                    prev_critiques=prev_critiques,
-                    unit_tests=unit_tests,
-                    custom_state=custom_state,
-                )
-                output.extend(custom_output)
-
+        # could parallelize this
+        for model in self.components:
+            if isinstance(model, Component):  # Run Component
+                model.run(conv, prev_state, current_state)
             else:
                 raise ValueError(f"Unsupported object type: {type(model).__name__}")
 
-        return output, output_critiques, unit_tests
+        for key in prev_state:
+            if key not in current_state:  # if value has not been updated
+                current_state[key] = prev_state[key]  # populate and pass to next layer
+
+        return current_state
 
 
 class Archon:
@@ -183,17 +120,17 @@ class Archon:
     """
 
     def __init__(
-        self, config, api_key_data=None, query_saves=False, mock_api_calls=False
+        self, config: dict, api_key_data: Any=None, query_saves: bool=False, mock_api_calls: bool=False
     ):
-        """
-        Initialize the Archon with configuration settings.
+        """ Initialize the Archon with configuration settings.
 
-        Parameters:
-        config (dict): Configuration dictionary containing layers and other settings.
-        api_key_data (Union[dict, str], optional): api_key data to use on generation. Defaults to None and use environment variables otherwise.
-        query_saves (bool): save the queries generated by each layer for analysis
-        mock_api_calls (bool): generate mock responses instead of calling the model provider
-        """
+        Args:
+            config (_type_): Configuration dictionary containing layers and other settings.
+            api_key_data (Any, optional): api_key data to use on generation. Defaults to None.
+            query_saves (bool, optional): save the queries generated by each layer for analysis. Defaults to False.
+            mock_api_calls (bool, optional): generate mock responses instead of calling the model provider. Defaults to False.
+        """      
+
         self.config = config
         self.initialized = False
         self.mock_api_calls = mock_api_calls
@@ -246,12 +183,11 @@ class Archon:
         print(f"Archon initialized with {len(self.layers)} layers.")
         self.initialized = True
 
-    def generate(self, conv, temperature=None):
+    def generate(self, conv: list) -> str:
         """generate a single output to the latest query in the conversation using your Archon config.
 
         Args:
             conv (list): A list of the conversation so far
-            temperature (float, optional): temperature to use for only generators. Defaults to None.
 
         Returns:
             str: generated answer to given conversation
@@ -275,16 +211,16 @@ class Archon:
                 message for message in conv
             ]
 
-        response, _, output_storage = self._generate(conv, temperature)
+        responses, output_storage = self._generate(conv)
 
         if utils.DEBUG_ARCHON:
-            if not len(response) > 0:
-                logger.error(f"Response is empty: {response}")
-            if not isinstance(response, list):
-                logger.error(f"Response is not a list: {response}")
-            if not isinstance(response[0], str):
+            if not len(responses) > 0:
+                logger.error(f"responses is empty: {responses}")
+            if not isinstance(responses, list):
+                logger.error(f"responses is not a list: {responses}")
+            if not isinstance(responses[0], str):
                 logger.error(
-                    f"First element of response is not a string: {response[0]}"
+                    f"First element of responses is not a string: {responses[0]}"
                 )
 
         if self.query_saves:
@@ -308,81 +244,79 @@ class Archon:
             print(f"Output saved to: {filepath}")
 
         assert (
-            len(response) > 0
-            and isinstance(response[0], str)
-            and isinstance(response, list)
-        ), f"response not valid: {response}"
+            len(responses) > 0
+            and isinstance(responses[0], str)
+            and isinstance(responses, list)
+        ), f"response not valid: {responses}"
 
         # random if multiple outputs
-        if len(response) > 1:
-            response = [random.choice(response)]
+        if len(responses) > 1:
+            responses = [random.choice(responses)]
 
-        return response[0]
+        return responses[0]
 
-    def _generate(self, conv, temperature=None):
-        """
-        Generate responses by applying each layer sequentially to the inputs.
-
-        Parameters:
-        conv (str): list of dicts
-        temperature (float, optional): temperature to use for only generators. Defaults to None.
+    def _generate(self, conv: list) -> Tuple[list, list]:
+        """ Generate responses by applying each layer sequentially to the inputs.
+        
+        Args:
+            conv (list): List of the conversation so far
 
         Returns:
-        list of str: The final generated responses.
-        """
+            Tuple[list, list]: a tuple of final_outputs and output_storage. 
+                A list containing the final response and a list of data to store
+        """        
 
         # messages should just be a single list of optional system and user messages
         # query = conv[-1]["content"]
 
-        prev_output = []
-        prev_critiques = []
-        unit_tests = None
+        prev_state = defaultdict(list)
         output_storage = []
-        custom_state = {}
 
         for i in range(len(self.layers)):
 
             layer = self.layers[i]
-            layer_output = []
-            layer_critique = []
 
             if utils.DEBUG:
+                prev_candidates = prev_state["candidates"]
+                prev_critiques_len = len(prev_state["critiques"])
                 logger.debug(
-                    f"Running layer {i}, with {len(prev_output)} previous outputs and {len(prev_critiques) if prev_critiques else 0} previous critiques"
+                    f"Running layer {i}, with {len(prev_candidates)} previous candidates and {prev_critiques_len} previous critiques"
                 )
 
-            if utils.DEBUG:
-                logger.debug(f"Running layer {i}")
-
-            layer_output, layer_critique, unit_tests = layer.process(
+            new_state = layer.process(
                 conv,
-                prev_output,
-                prev_critiques,
-                unit_tests=unit_tests,
-                custom_state=custom_state,
-                temperature=temperature,
+                prev_state,
             )
 
-            prev_output = layer_output
+            # This is prob how I would want to do query saves later.
+            # Save the states, and prob have a verbose for each one
+            # print(f"-----PREV_{i}-----------")
+            # for key in prev_state.keys():
+            #     print(f"{key}:{len(prev_state[key])}")
+            # print(f"-----NEW_{i}-------------")
+            # for key in new_state.keys():
+            #     print(f"{key}:{len(new_state[key])}")
+            # print("-----------------")
 
-            # None if empty
-            prev_critiques = layer_critique if layer_critique else None
+            prev_state = new_state
 
             if self.query_saves:
                 current_output = []
-                for i, layer_config in enumerate(layer.config):
-                    layer_config_with_output = layer_config.copy()
-                    layer_config_with_output["output"] = prev_output[i]
-                    layer_config_with_output["critique"] = prev_critiques
-                    current_output.append(layer_config_with_output)
+                for i, component_config in enumerate(layer.config):
+                    component_config_with_output = component_config.copy()
+                    component_config_with_output["output"] = prev_state["candidates"][i]
+                    component_config_with_output["critique"] = prev_state["critiques"]
+                    current_output.append(component_config_with_output)
                 output_storage.append(current_output)
 
-        if len(prev_output) == 0:
+        final_outputs = prev_state["candidates"]
+        if len(prev_state["candidates"]) == 0:
             logger.warning("No output generated by Archon!")
-        elif len(prev_output) > 1:
+        elif len(prev_state["candidates"]) > 1:
+            prev_candidates = prev_state["candidates"]
             logger.warning(
-                f"Multiple outputs generated by Archon! Returning a random candidate from the set of {len(prev_output)} choices."
+                f"Multiple outputs generated by Archon! Returning a random candidate from the set of {prev_candidates} choices."
             )
-            prev_output = [random.choice(prev_output)]
+            final_outputs = [random.choice(final_outputs)]
 
-        return prev_output, prev_critiques, output_storage
+        return final_outputs, output_storage

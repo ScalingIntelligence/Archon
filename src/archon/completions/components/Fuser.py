@@ -1,16 +1,14 @@
 from .Generator import Generator
+from .Component import Component
 from loguru import logger
 from .. import utils
 from .prompts import make_fuser_prompt
 
 
-class Fuser:
+class Fuser(Component):
     def __init__(self, config):
         """
         Initialize the Fuser with configuration settings.
-
-        Fuser class is responsible for handling the inputs
-        Adding appropriate system messages
 
         Parameters:
         config (dict): Configuration dictionary containing model settings and other parameters.
@@ -33,40 +31,60 @@ class Fuser:
         self.length_control = self.config.get("length_control", False)
         print(f"Fuser initialized with model: {self.model}")
 
-    def fuse(self, messages, contexts, critiques=None):
+    def run(self, conversation, prev_state, state):
         """
-        Fuse the generations from multiple models based on the provided query and contexts.
+        Run a component and updates the state accordingly.
 
-        Parameters:
-        init_conv (list of dict): The conversation of the user.
-        contexts (list of str): The list of contexts to generate responses from.
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        candidates = prev_state["candidates"]
+        critiques = prev_state.get("critiques", None)
+        fused_candidates = self.fuse(conversation, candidates, critiques)
+
+        state["candidates"].extend(fused_candidates)
+        
+        return
+    
+    def fuse(self, conversation: list, candidates: list, critiques: list=None) -> list:
+        """
+        Fuse the generations from multiple models
+
+        Args:
+            conversation (list): A list of the conversation so far
+            candidates (list):  The list of candidates to generate responses from.
+            critiques (list, optional): A list of critiques, one per candidates. Defaults to None.
 
         Returns:
-        list of str: The top_k_fused_generations fused results.
-        """
+            list: fused responses
+        """        
 
-        assert isinstance(messages, list) and isinstance(messages[0], dict)
-        for item in messages:
+        assert isinstance(conversation, list) and isinstance(conversation[0], dict)
+        for item in conversation:
             assert isinstance(item, dict) and "role" in item and "content" in item
         # assert init_conv[0]["role"] == "user" and len(init_conv[0]["content"]) > 0
         assert (
-            isinstance(contexts, list)
-            and all(isinstance(context, str) for context in contexts)
-            and len(contexts) > 0
+            isinstance(candidates, list)
+            and all(isinstance(context, str) for context in candidates)
+            and len(candidates) > 0
         )
 
         if utils.DEBUG:
-            logger.debug(f"Length of contexts: {len(contexts)}")
+            logger.debug(f"Length of candidates: {len(candidates)}")
             logger.debug(
                 f"Length of critiques: {len(critiques) if critiques else 'NA'}"
             )
-            logger.debug(f"{contexts=}")
-            logger.debug(f"{messages=}")
+            logger.debug(f"{candidates=}")
+            logger.debug(f"{conversation=}")
 
         # breakpoint()
 
         fuser_prompt = make_fuser_prompt(
-            messages, contexts, critiques, length_control=self.length_control
+            conversation, candidates, critiques, length_control=self.length_control
         )
 
         messages = (
@@ -77,7 +95,7 @@ class Fuser:
                 }
             ]  # system
             + [
-                message for message in messages[:-1] if message["role"] != "system"
+                message for message in conversation[:-1] if message["role"] != "system"
             ]  # rest of conversation without query
             + [{"role": "user", "content": fuser_prompt}]  # fuser prompt
         )

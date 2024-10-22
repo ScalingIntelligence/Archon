@@ -1,4 +1,5 @@
 from .Generator import Generator
+from .Component import Component
 import threading
 from .. import utils
 from loguru import logger
@@ -6,7 +7,7 @@ import re
 from .prompts import make_ranker_prompt
 
 
-class Ranker:
+class Ranker(Component):
     def __init__(self, config):
         """
         Initialize the Ranking class with configuration settings.
@@ -28,8 +29,6 @@ class Ranker:
         self.temperature = self.config["temperature"]
         self.use_critiques = self.config.get("use_critiques", False)
 
-        # TODO: Add multi-sampling
-
         if self.model_name == "llm-blender/PairRM":
             # multiple threads will use the same tokenizer. So it has to be locked
             self.ranker_lock = threading.Lock()
@@ -48,14 +47,14 @@ class Ranker:
 
         print(f"Ranker initialized with model: {self.model_name}")
 
-    def extract_ranking(self, output: str, generations: list):
+    def extract_ranking(self, output: str, candidates: list):
         answer_str = output[0].partition("\n")[0]
         ranks_str = re.findall(r"\[(\d+)\]", answer_str)
 
-        # Check that length of ranks_str matches length of generations
-        # and that all the ranks are from 1 to len(generations), inclusive
-        if len(ranks_str) == len(generations) and all(
-            1 <= int(rank) <= len(generations) for rank in ranks_str
+        # Check that length of ranks_str matches length of candidates
+        # and that all the ranks are from 1 to len(candidates), inclusive
+        if len(ranks_str) == len(candidates) and all(
+            1 <= int(rank) <= len(candidates) for rank in ranks_str
         ):
             return ranks_str
         else:
@@ -70,7 +69,7 @@ class Ranker:
             # Add missing generation indices to the end of the list
             ranks_str += [
                 str(i)
-                for i in range(1, len(generations) + 1)
+                for i in range(1, len(candidates) + 1)
                 if str(i) not in ranks_str
             ]
 
@@ -79,35 +78,35 @@ class Ranker:
             [
                 final.append(x)
                 for x in ranks_str
-                if x not in final and 1 <= int(x) <= len(generations)
+                if x not in final and 1 <= int(x) <= len(candidates)
             ]
 
-            assert len(final) == len(generations) and all(
-                1 <= int(rank) <= len(generations) for rank in final
+            assert len(final) == len(candidates) and all(
+                1 <= int(rank) <= len(candidates) for rank in final
             )
 
             return final
 
-    def llm_rank(self, messages, generations, critiques=None):
+    def llm_rank(self, conversation, candidates, critiques=None):
         """
-        Rank the generations based on the provided query and critiques.
+        Rank the candidates based on the provided query and critiques.
 
         Parameters:
-        query (str): The input query.
-        generations (list of str): The list of generations to rank.
+        conversation (list): The conversation so far
+        candidates (list of str): The list of candidates to rank.
         critiques (list of str, optional): The list of critiques corresponding to each generation.
 
         Returns:
-        list of str: The top_k ranked generations.
+        list of str: The top_k ranked candidates.
         """
 
         if critiques and self.use_critiques:
-            assert len(generations) == len(
+            assert len(candidates) == len(
                 critiques
-            ), "Number of critiques must match number of generations."
+            ), "Number of critiques must match number of candidates."
 
-        query = messages[-1]["content"]
-        ranking_prompt = make_ranker_prompt(generations, query, critiques)
+        query = conversation[-1]["content"]
+        ranking_prompt = make_ranker_prompt(candidates, query, critiques)
 
         messages = (
             [
@@ -117,16 +116,16 @@ class Ranker:
                 }
             ]  # system
             + [
-                message for message in messages[:-1] if message["role"] != "system"
+                message for message in conversation[:-1] if message["role"] != "system"
             ]  # rest of conversation without query
             + [{"role": "user", "content": ranking_prompt}]  # prompt
         )
 
         output = self.ranker.generate_from_messages(messages)
-        ranks_str = self.extract_ranking(output, generations)
+        ranks_str = self.extract_ranking(output, candidates)
 
         ranks = [int(i) for i in ranks_str]
-        ranking = [generations[i - 1] for i in ranks]
+        ranking = [candidates[i - 1] for i in ranks]
         top_k_contexts = ranking[: self.top_k]
 
         top_k_critiques = None
@@ -135,7 +134,7 @@ class Ranker:
             top_k_critiques = critique_ranking[: self.top_k]
             assert len(top_k_critiques) == len(
                 top_k_contexts
-            ), "Number of TOP critiques must match number of TOP generations."
+            ), "Number of TOP critiques must match number of TOP candidates."
 
         if utils.DEBUG:
             logger.debug(f"{output=}")
@@ -151,7 +150,7 @@ class Ranker:
         with self.ranker_lock:
             scores = self.ranker.rank(
                 [query],  # 1 query (1D)
-                [generations],  # 1 set of generations for query (2D)
+                [candidates],  # 1 set of candidates for query (2D)
                 return_scores=True,
                 batch_size=self.ranker_batch_size,
                 disable_tqdm=True,
@@ -169,7 +168,7 @@ class Ranker:
                 logger.debug(f"{scores=}")
                 logger.debug(f"{ranks=}")
 
-            ranking = [generations[i] for i in ranks[0]]
+            ranking = [candidates[i] for i in ranks[0]]
 
             top_k_contexts = ranking[: self.top_k]
 
@@ -179,33 +178,55 @@ class Ranker:
 
         return (top_k_contexts, None)
 
-    def rank(self, messages, generations, critiques=None):
+    def run(self, conversation, prev_state, state):
         """
-        Rank the generations based on the provided query.
+        Run a component and updates the state accordingly.
 
-        Parameters:
-        query (str): The input query.
-        generations (list of str): The list of generations to rank.
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        candidates = prev_state["candidates"]
+        critiques = prev_state.get("critiques", None)
+        top_k_contexts, top_k_critiques = self.rank(conversation, candidates, critiques)
+
+        state["candidates"].extend(top_k_contexts)
+        if top_k_critiques:
+            state["critiques"].extend(top_k_critiques)
+        
+        return
+
+    def rank(self, conversation: list, candidates, critiques: list=None):
+        """
+        Rank the candidates based on the provided conversation.
+
+        Args:
+            conversation (list): A list of the conversation so far
+            candidates (list):  The list of candidates to generate responses from.
+            critiques (list, optional): A list of critiques, one per candidates. Defaults to None.
 
         Returns:
-        list of str: The top_k ranked generations.
+            list: The top_k ranked candidates.
         """
 
-        assert isinstance(messages, list) and isinstance(messages[-1], dict)
-        assert messages[-1]["role"] == "user"
-        assert isinstance(generations, list) and len(generations) > 0
-        query = messages[-1]["content"]
+        assert isinstance(conversation, list) and isinstance(conversation[-1], dict)
+        assert conversation[-1]["role"] == "user"
+        assert isinstance(candidates, list) and len(candidates) > 0
+        query = conversation[-1]["content"]
 
         if utils.DEBUG:
             logger.debug(
-                f"Ranking {len(generations)} generations with {self.model_name}"
+                f"Ranking {len(candidates)} candidates with {self.model_name}"
             )
 
         if self.model_name == "llm-blender/PairRM":
-            top_k_contexts, top_k_critiques = self.pairrm_rank(query, generations)
+            top_k_contexts, top_k_critiques = self.pairrm_rank(query, candidates)
         else:
             top_k_contexts, top_k_critiques = self.llm_rank(
-                messages, generations, critiques
+                conversation, candidates, critiques
             )
 
         return top_k_contexts, top_k_critiques

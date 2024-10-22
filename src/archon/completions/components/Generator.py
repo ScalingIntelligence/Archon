@@ -11,6 +11,8 @@ from ..utils import (
 )
 import loguru as logger
 
+from .Component import Component
+
 GENERATE_MAP = {
     "Together_API": generate_together,
     "OpenAI_API": generate_openai,
@@ -22,7 +24,7 @@ GENERATE_MAP = {
 }
 
 
-class Generator:
+class Generator(Component):
     def __init__(self, config, custom_generators=None):
         """
         Initialize the Model with configuration settings.
@@ -98,6 +100,23 @@ class Generator:
                 outputs.append(output)
 
         return outputs
+
+    def run(self, conversation, prev_state, state):
+        """
+        Run a component and updates the state accordingly.
+
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        outputs = self.generate_from_messages(conversation)
+        
+        state["candidates"].extend(outputs)
+
+        return
 
     def generate_from_query(self, query: str = None, temperature=None):
         assert isinstance(query, str)

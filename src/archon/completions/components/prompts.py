@@ -1,5 +1,6 @@
 # generator has no custom prompt. Just the conversation
 
+
 def make_critic_prompt(query, candidates):
     num = len(candidates)
     prompt = f"I will provide you with {num} responses, each indicated by a numerical identifier []. Evaluate the strengths and weaknesses of each response based on the instruction: {query}.\n"
@@ -24,7 +25,7 @@ def make_fuser_prompt(conv, references, critiques=None, length_control=False):
 
     query = conv[-1]["content"]
 
-    if critiques is not None:
+    if critiques:
 
         prompt = f"You have been provided with a set of responses with their individual critiques of strengths/weaknesses from various open-source models to the latest user query, which is {query}. Your task is to \
             synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses and their provided critiques of \

@@ -2,11 +2,12 @@ import pdb
 import re
 import ast
 from .Generator import Generator
+from .Component import Component
 from loguru import logger
 from .prompts import make_unit_test_evaluator_prompt
 
 
-class Unit_Test_Evaluator:
+class Unit_Test_Evaluator(Component):
     def __init__(self, config):
         """
         Initialize the Unit_Test_Evaluator with configuration settings.
@@ -42,26 +43,46 @@ class Unit_Test_Evaluator:
 
         print(f"Unit_Test_Evaluator model initialized: {self.model_name}")
 
+    def run(self, conversation, prev_state, state):
+        """
+        Run a component and updates the state accordingly.
+
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        candidates = prev_state["candidates"]
+        unit_tests = prev_state["unit_tests"]
+
+        evaluated_candidates = self.evaluate_unit_tests(conversation, candidates, unit_tests)
+        
+        state["candidates"].extend(evaluated_candidates)
+
+        return
+    
     def evaluate_unit_tests(
         self,
-        messages: list,
+        conversation: list,
         candidate_responses: list,
         unit_tests: list,
     ):
         """
-        Generate unit tests for a given query.
+        Generate unit tests for a given conversation.
 
-        Parameters:
-        init_input (list of dicts): The conversation.
-        candidate_responses (list of str): The candidate responses to evaluate.
-        unit_tests (list of str): The unit tests to evaluate.
+        Args:
+            conversation (list): A list of the conversation so far
+            candidates (list):  The list of candidates to generate responses from.
+            unit_tests (list, optional): A list of unit tests
 
         Returns:
-        list of str: The top_k ranked generations.
+            list: The top_k ranked candidates passed off passed unit_tests.
         """
 
-        # If it is a multi-stage conversation, extract all the user queries from the messages
-        query = messages[-1]["content"]
+        # If it is a multi-stage conversation, extract all the user queries from the conversation
+        query = conversation[-1]["content"]
         query = query.strip()
 
         if self.remove_unit_tests_from_prompt:
@@ -102,7 +123,7 @@ class Unit_Test_Evaluator:
                     }
                 ]  # system
                 + [
-                    message for message in messages[:-1] if message["role"] != "system"
+                    message for message in conversation[:-1] if message["role"] != "system"
                 ]  # rest of conversation without query
                 + [{"role": "user", "content": evaluator_prompt}]  # prompt
             )

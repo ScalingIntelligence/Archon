@@ -1,11 +1,12 @@
 import re
 from .Generator import Generator
+from .Component import Component
 from .. import utils
 from loguru import logger
 from .prompts import make_verifier_reasoning_prompt, make_verifier_verdict_prompt
 
 
-class Verifier:
+class Verifier(Component):
     def __init__(self, config):
         """
         Initialize the Verifier with configuration settings.
@@ -41,18 +42,18 @@ class Verifier:
 
         return reasons_list
 
-    def generate_reasoning(self, messages, candidate):
+    def generate_reasoning(self, conversation, candidate):
         """
         Generate reasoning for a candidate.
 
         Parameters:
-        query (str): The input query.
+        conversation (list): The conversation so far.
         candidates (str): The candidate for reasoning
 
         Returns:
         list[str]: The reasonings for the candidate.
         """
-        query = messages[-1]["content"]
+        query = conversation[-1]["content"]
         assert isinstance(query, str) and len(query) > 0
         assert isinstance(candidate, str)
 
@@ -66,7 +67,7 @@ class Verifier:
                 }
             ]  # system
             + [
-                message for message in messages[:-1] if message["role"] != "system"
+                message for message in conversation[:-1] if message["role"] != "system"
             ]  # rest of conversation without query
             + [{"role": "user", "content": reasoning_prompt}]  # prompt
         )
@@ -104,19 +105,19 @@ class Verifier:
         # return "[Correct]" if "[Correct]" in generated_response else "[Incorrect]"
         return 1 if "[Correct]" in generated_response else 0
 
-    def verify_query_reasoning_pairs(self, messages, candidate: str, reasoning: str):
+    def verify_query_reasoning_pairs(self, conversation: list, candidate: str, reasoning: str):
         """
         Verify the query-reasoning pair.
 
         Parameters:
-        query (str): The input query.
+        conversation (list): The conversation so far.
         candidate (str): The candidate generation.
         reasoning (str): The reasoning for the candidate.
 
         Returns:
         int: 1 if the reasoning is correct, 0 otherwise.
         """
-        query = messages[-1]["content"]
+        query = conversation[-1]["content"]
         assert isinstance(query, str) and len(query) > 0
         assert isinstance(candidate, str) and len(candidate) > 0
         assert isinstance(reasoning, str) and len(reasoning) > 0
@@ -131,7 +132,7 @@ class Verifier:
                 }
             ]  # system
             + [
-                message for message in messages[:-1] if message["role"] != "system"
+                message for message in conversation[:-1] if message["role"] != "system"
             ]  # rest of conversation without query
             + [{"role": "user", "content": verdict_prompt}]  # prompt
         )
@@ -183,23 +184,45 @@ class Verifier:
             if utils.DEBUG_VERIFIER:
                 logger.error(f"Verdict not found in verification output: {output}")
             raise ValueError("Verdict not found in verification output.")
+   
+    def run(self, conversation, prev_state, state):
+        """
+        Run a component and updates the state accordingly.
 
-    def verify(self, messages, candidates, critiques):
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        candidates = prev_state["candidates"]
+        critiques = prev_state.get("critiques", None)
+        verified_candidates, verified_critiques = self.verify(conversation, candidates, critiques)
+
+        state["candidates"].extend(verified_candidates)
+        if verified_critiques:
+            state["critiques"].extend(verified_critiques)
+
+        return
+
+    def verify(self, conversation: list, candidates: list, critiques:list=None):
         """
         Filter responses based on verification results.
 
-        Parameters:
-        init_input (dict): The input conversation.
-        candidates (list of str): The list of candidate generations.
+        Args:
+            conversation (list): A list of the conversation so far
+            candidates (list):  The list of candidates to generate responses from.
+            critiques (list, optional): A list of critiques, one per candidates. Defaults to None.
 
         Returns:
-        list: A list of verified correct candidate responses.
+            list: A list of verified correct candidate responses.
         """
 
-        assert isinstance(messages, list) and isinstance(messages[-1], dict)
-        assert messages[-1]["role"] == "user"
+        assert isinstance(conversation, list) and isinstance(conversation[-1], dict)
+        assert conversation[-1]["role"] == "user"
         assert isinstance(candidates, list) and len(candidates) > 0
-        query = messages[-1]["content"]
+        query = conversation[-1]["content"]
 
         ####################################
 
@@ -207,7 +230,7 @@ class Verifier:
         verified_critiques = []
         incorrect_responses = []
 
-        if critiques is not None:
+        if critiques:
             assert isinstance(critiques, list) and all(
                 isinstance(critique, str) for critique in critiques
             )
@@ -217,10 +240,10 @@ class Verifier:
             cand = candidates[i]
             try:
 
-                reasoning = self.generate_reasoning(messages, cand)
+                reasoning = self.generate_reasoning(conversation, cand)
 
                 verification_result = self.verify_query_reasoning_pairs(
-                    messages, cand, reasoning
+                    conversation, cand, reasoning
                 )
                 if utils.DEBUG_VERIFIER:
                     logger.debug(f"{verification_result}")

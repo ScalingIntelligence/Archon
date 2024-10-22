@@ -1,10 +1,10 @@
 import re
-
+from .Component import Component
 from .Generator import Generator
 from .prompts import make_critic_prompt
 
 
-class Critic:
+class Critic(Component):
     def __init__(self, config):
         """
         Initialize the Critic with configuration settings.
@@ -27,22 +27,40 @@ class Critic:
         self.critic = Generator(config=self.config)
 
         print(f"Critic model initialized: {self.model_name}")
-
-    def evaluate_candidates(self, messages, candidates):
+    
+    def run(self, conversation, prev_state, state):
         """
-        Evaluate the strengths and weaknesses of each candidate.
+        Run a component and updates the state accordingly.
 
-        Parameters:
-        query (str): The input query.
-        candidates (list of str): The list of candidate generations to evaluate.
+        Args:
+            conversation (list[dict]): A list of dictionaries representing the conversation with Archon. 
+                Each dictionary contains role and content
+            prev_state (dict): A dictionary representing the state from the previous layer.
+            state (dict): A dictionary holding the values that will be updated from the previous layer to be sent to the next layer
+        """
+
+        candidates = prev_state["candidates"]
+        critiques = self.evaluate_candidates(conversation, candidates)
+        
+        state["critiques"].extend(critiques)
+
+        return
+
+    def evaluate_candidates(self, conversation: list, candidates: list) -> list:
+        """Evaluate the strengths and weaknesses of each candidate.
+
+        Args:
+            conversation (list): The conversation so far
+            candidates (list): The list of candidate generations to evaluate.
 
         Returns:
-        dict: A dictionary with strengths and weaknesses for each candidate.
-        """
-        assert isinstance(messages, list) and len(messages) > 0
+            list: A list of the critiques, where each index corresponds to the candidate
+        """        
+    
+        assert isinstance(conversation, list) and len(conversation) > 0
         assert isinstance(candidates, list) and len(candidates) > 0
 
-        query = messages[-1]["content"]
+        query = conversation[-1]["content"]
         critic_prompt = make_critic_prompt(query, candidates)
 
         messages = (
@@ -53,7 +71,7 @@ class Critic:
                 }
             ]  # system
             + [
-                message for message in messages[:-1] if message["role"] != "system"
+                message for message in conversation[:-1] if message["role"] != "system"
             ]  # rest of conversation without query
             + [{"role": "user", "content": critic_prompt}]  # prompt
         )
@@ -71,16 +89,16 @@ class Critic:
 
         raise ValueError("Failed to evaluate candidates with critic!")
 
-    def parse_evaluation_output(self, output, candidates):
-        """
-        Parse the output from the evaluation model to extract strengths and weaknesses.
+    def parse_evaluation_output(self, output: str, candidates: list) -> list:
+        """Parse the output from the evaluation model to extract strengths and weaknesses.
 
-        Parameters:
-        output (str): The raw output from the evaluation model.
+        Args:
+            output (str): The raw output from the evaluation model.
+            candidates (list): A list of the candidates
 
         Returns:
-        list: A list of strings with strengths and weaknesses for each candidate.
-        """
+            list: a list of the critiques per candidate
+        """        
 
         assert isinstance(output, str) and len(output) > 0
         output = (

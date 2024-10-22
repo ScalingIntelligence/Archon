@@ -11,8 +11,9 @@ import json
 import random
 from litellm import completion
 import re
-from typing import Dict, Any
+from typing import Dict, Any, List
 from dotenv import load_dotenv
+
 load_dotenv()
 
 DEBUG = int(os.environ.get("DEBUG", "0"))
@@ -32,8 +33,9 @@ KEY_NAMES = (
     "AWS_SECRET_ACCESS_KEY",
     "AWS_REGION_NAME",
     "GOOGLE_API_KEY",
-    "EXAMPLE_API_KEY"
+    "EXAMPLE_API_KEY",
 )
+
 
 class AllKeysUsedError(Exception):
     """Raised when all available API keys for a specific type have been used."""
@@ -63,12 +65,13 @@ class keyHandler:
                 raise FileNotFoundError(
                     f"API key file '{self.api_key_data}' not found."
                 )
+
     def _load_env_keys(self) -> Dict[str, Any]:
         # Dictionary to store the processed environment variables
         processed_env: Dict[str, List[str]] = {}
 
         # Regular expression to match the variable names
-        pattern = re.compile(r'^(.+?)(?:_(\d+))?$')
+        pattern = re.compile(r"^(.+?)(?:_(\d+))?$")
 
         # Iterate through all environment variables
         for key, value in os.environ.items():
@@ -77,14 +80,14 @@ class keyHandler:
                 match = pattern.match(key)
                 if match:
                     base_key, _ = match.groups()
-                    
+
                     if base_key in processed_env:
                         processed_env[base_key].append(value)
                     else:
                         processed_env[base_key] = [value]
 
         return processed_env
-    
+
     def get_current_key(self, api_key_type):
         if api_key_type not in self.all_api_keys:
             raise ValueError(
